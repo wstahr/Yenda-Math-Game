@@ -17,9 +17,6 @@
   import { getDatabase, ref, push, get, query, orderByChild, limitToLast }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  /* ┌─────────────────────────────────────────────────────┐
-     │  PASTE YOUR FIREBASE CONFIG HERE (Step 3 below)    │
-     └─────────────────────────────────────────────────────┘ */
   const firebaseConfig = {
     apiKey:            "AIzaSyALyuilwdXv6DKIE6T3OdcEaC-bjxlZvlY",
     authDomain:        "yenda-s-naplan-math-game.firebaseapp.com",
@@ -31,16 +28,20 @@
     measurementId:     "G-BMPKRX844Q"
   };
 
-  try {
-    const app = initializeApp(firebaseConfig);
-    const db  = getDatabase(app);
-    window._fb = { db, ref, push, get, query, orderByChild, limitToLast };
-    console.log("✅ Firebase connected");
-  } catch(e) {
-    window._fb = null;
-    console.warn("Firebase error:", e.message);
-  }
-  document.dispatchEvent(new Event('fb-ready'));
+  // Expose a promise so non-module JS can await Firebase being ready
+  window._fbReady = new Promise(resolve => {
+    try {
+      const app = initializeApp(firebaseConfig);
+      const db  = getDatabase(app);
+      window._fb = { db, ref, push, get, query, orderByChild, limitToLast };
+      console.log("✅ Firebase connected");
+    } catch(e) {
+      window._fb = null;
+      window._fbError = e.message;
+      console.warn("Firebase error:", e.message);
+    }
+    resolve();
+  });
 </script>
 
 <style>
@@ -191,8 +192,8 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
 /* ══════════════ RANKINGS ══════════════ */
 #screen-rankings{background:#f4f6f2}
 .rank-header{padding:20px 24px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.rank-filter{font-size:12px;color:var(--moss);font-weight:500;cursor:pointer;padding:6px 14px;border:1.5px solid var(--moss);border-radius:20px;transition:all .2s;-webkit-tap-highlight-color:transparent}
-.rank-filter:active{background:var(--moss);color:white}
+.rank-filter{font-size:12px;color:var(--moss);font-weight:500;cursor:pointer;padding:6px 32px 6px 14px;border:1.5px solid var(--moss);border-radius:20px;transition:all .2s;-webkit-tap-highlight-color:transparent;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7c5a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center;-webkit-appearance:none;appearance:none;outline:none;font-family:'Zen Kaku Gothic New',sans-serif}
+.rank-filter:focus{box-shadow:0 0 0 3px rgba(107,124,90,.15)}
 .offline-banner{margin:0 24px 12px;padding:10px 16px;background:var(--amber-l);border:1px solid #f0d090;border-radius:14px;flex-shrink:0;display:none;align-items:center;gap:8px}
 .offline-banner.show{display:flex}
 .offline-banner span{font-size:11px;color:var(--charcoal);line-height:1.5}
@@ -403,7 +404,14 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
           <div class="screen-subtitle" style="margin-bottom:4px">Global</div>
           <div class="screen-title">Rankings</div>
         </div>
-        <div class="rank-filter" id="rankFilter">Year 4 ▾</div>
+        <select class="rank-filter" id="rankFilter">
+          <option value="1">Year 1</option>
+          <option value="2">Year 2</option>
+          <option value="3">Year 3</option>
+          <option value="4" selected>Year 4</option>
+          <option value="5">Year 5</option>
+          <option value="6">Year 6</option>
+        </select>
       </div>
       <div class="offline-banner" id="offlineBanner">
         <span>⚠️</span>
@@ -606,17 +614,19 @@ document.getElementById('name-modal').addEventListener('click',e=>{ if(e.target=
 async function uploadScore(session){
   const el=document.getElementById('uploadStatus');
   el.classList.add('show');
-  if(!window._fb){
-    el.className='upload-status show us-offline';
-    document.getElementById('uploadIcon').textContent='📴';
-    document.getElementById('uploadText').textContent='Offline mode';
-    document.getElementById('uploadSub').textContent='Configure Firebase to enable rankings';
-    return;
-  }
   el.className='upload-status show us-uploading';
   document.getElementById('uploadIcon').textContent='⏳';
   document.getElementById('uploadText').textContent='Uploading to rankings…';
   document.getElementById('uploadSub').textContent='Just a moment';
+  // Wait for Firebase module to finish loading
+  if(window._fbReady) await window._fbReady;
+  if(!window._fb){
+    el.className='upload-status show us-offline';
+    document.getElementById('uploadIcon').textContent='📴';
+    document.getElementById('uploadText').textContent='Could not reach Firebase';
+    document.getElementById('uploadSub').textContent=window._fbError||'Score saved locally';
+    return;
+  }
   try{
     const {db,ref,push} = window._fb;
     await push(ref(db,`scores/year${session.year}`),{
@@ -645,15 +655,17 @@ async function loadRankings(){
   const list=document.getElementById('rankList');
   const pod=document.getElementById('podium');
   const banner=document.getElementById('offlineBanner');
+  list.innerHTML=`<div class="rank-loading"><div class="spin">🌿</div><p>Loading rankings…</p></div>`;
+  pod.innerHTML='';
+  // Wait for Firebase module to finish loading
+  if(window._fbReady) await window._fbReady;
   if(!window._fb){
     banner.classList.add('show');
-    pod.innerHTML='';
-    list.innerHTML=`<div class="rank-empty"><div class="big">🔌</div><p>Firebase not connected.<br>Follow the setup guide below<br>to enable global rankings.</p></div>`;
+    banner.innerHTML=`<span>⚠️</span><span>Firebase error: ${window._fbError||'Could not connect'}. Check console for details.</span>`;
+    list.innerHTML=`<div class="rank-empty"><div class="big">🔌</div><p>Could not connect to Firebase.<br>${window._fbError||''}</p></div>`;
     return;
   }
   banner.classList.remove('show');
-  list.innerHTML=`<div class="rank-loading"><div class="spin">🌿</div><p>Loading rankings…</p></div>`;
-  pod.innerHTML='';
   try{
     const {db,ref,query,orderByChild,limitToLast,get}=window._fb;
     const snap=await get(query(ref(db,`scores/year${rankYear}`),orderByChild('duration'),limitToLast(200)));
@@ -662,7 +674,6 @@ async function loadRankings(){
       return;
     }
     const all=[]; snap.forEach(c=>all.push({...c.val()}));
-    // Best per player
     const best={};
     all.forEach(e=>{ const k=e.playerId||e.playerName; if(!best[k]||e.duration<best[k].duration) best[k]=e; });
     const ranked=Object.values(best).sort((a,b)=>a.duration-b.duration).slice(0,20);
@@ -711,7 +722,7 @@ function navigate(id){
   if(id==='history')  renderHistory();
   if(id==='calendar') renderCalendar();
   if(id==='home')     renderHomeStats();
-  if(id==='rankings'){rankYear=selYear;document.getElementById('rankFilter').textContent=`Year ${rankYear} ▾`;loadRankings();}
+  if(id==='rankings'){rankYear=selYear;document.getElementById('rankFilter').value=rankYear;loadRankings();}
 }
 
 /* ══════════════════════════════════════════════
@@ -893,7 +904,7 @@ document.getElementById('tab-bar').addEventListener('click',e=>{
   if(id==='quiz'){if(!playerName){showNameModal();return;}startQuiz();}
   navigate(id);
 });
-document.getElementById('rankFilter').addEventListener('click',()=>{ rankYear=rankYear>=6?1:rankYear+1; document.getElementById('rankFilter').textContent=`Year ${rankYear} ▾`; loadRankings(); });
+document.getElementById('rankFilter').addEventListener('change', e=>{ rankYear=parseInt(e.target.value); loadRankings(); });
 
 /* ══════════════════════════════════════════════
    QUESTION BANK
