@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Yenda Math · 算数の練習</title>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FIREBASE SDK  — loaded as ES module
+     STEP 3: Replace firebaseConfig below with your own values
+     (see the Firebase Setup Guide further down in this file)
+═══════════════════════════════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, push, get, query, orderByChild, limitToLast }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  /* ┌─────────────────────────────────────────────────────┐
+     │  PASTE YOUR FIREBASE CONFIG HERE (Step 3 below)    │
+     └─────────────────────────────────────────────────────┘ */
+  const firebaseConfig = {
+      apiKey: "AIzaSyALyuilwdXv6DKIE6T3OdcEaC-bjxlZvlY",
+        authDomain: "yenda-s-naplan-math-game.firebaseapp.com",
+        databaseURL: "https://yenda-s-naplan-math-game-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "yenda-s-naplan-math-game",
+        storageBucket: "yenda-s-naplan-math-game.firebasestorage.app",
+        messagingSenderId: "1048236999293",
+        appId: "1:1048236999293:web:2498f827b79b74f4dee714",
+        measurementId: "G-BMPKRX844Q"
+  };
+
+  try {
+    if (firebaseConfig.apiKey === "YOUR_API_KEY") throw new Error("not-configured");
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+    window._fb = { db, ref, push, get, query, orderByChild, limitToLast };
+    console.log("✅ Firebase connected");
+  } catch(e) {
+    window._fb = null;
+    if (e.message !== "not-configured") console.warn("Firebase error:", e.message);
+    console.info("ℹ️  Running in offline mode — see Firebase Setup Guide in HTML source");
+  }
+  document.dispatchEvent(new Event('fb-ready'));
+</script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --stone:#f5f2ed;--parchment:#ede8e0;--fog:#ddd8d0;--ash:#b8b2a8;
+  --slate:#7a7570;--charcoal:#3d3a37;--ink:#1a1816;
+  --moss:#6b7c5a;--moss-l:#8fa07a;--moss-xl:#e8f0e4;
+  --cedar:#8b6f5e;--sakura:#c4857a;--sakura-l:#f5e8e6;
+  --amber:#c49a5a;--amber-l:#fef3e0;--paper:#faf8f4;--white:#ffffff;
+}
+html,body{height:100%;background:var(--ink);font-family:'Zen Kaku Gothic New',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+
+/* ── SHELL ── */
+#app-shell{width:390px;height:844px;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--paper);border-radius:50px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.6),0 8px 20px rgba(0,0,0,.4)}
+#status-bar{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:relative;z-index:100}
+.s-time{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:var(--charcoal)}
+.s-icons{font-size:11px;color:var(--charcoal);letter-spacing:2px}
+#dynamic-island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:var(--ink);border-radius:20px;z-index:200}
+#screens{height:calc(844px - 44px - 82px);overflow:hidden;position:relative}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:none;flex-direction:column;opacity:0;transform:translateX(20px);transition:opacity .28s ease,transform .28s ease;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{display:flex;opacity:1;transform:translateX(0)}
+
+/* ── TABS ── */
+#tab-bar{height:82px;background:rgba(250,248,244,.96);backdrop-filter:blur(20px);border-top:1px solid var(--fog);display:flex;align-items:flex-start;padding-top:8px;z-index:50}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 0;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.tab-icon{font-size:22px;line-height:1;transition:transform .2s}
+.tab-label{font-size:10px;color:var(--ash);transition:color .2s}
+.tab.active .tab-label{color:var(--moss);font-weight:500}
+.tab.active .tab-icon{transform:scale(1.1)}
+.tab:active .tab-icon{transform:scale(.9)}
+
+/* ── SHARED ── */
+.card{background:var(--white);border-radius:20px;border:1px solid var(--fog);box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.screen-title{font-family:'Shippori Mincho',serif;font-size:22px;font-weight:500;color:var(--charcoal)}
+.screen-subtitle{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--ash);font-family:'JetBrains Mono',monospace}
+.section-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--ash);margin-bottom:12px;display:block}
+
+/* ══════════════ NAME MODAL ══════════════ */
+#name-modal{position:absolute;inset:0;background:rgba(26,24,22,.55);backdrop-filter:blur(8px);z-index:400;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s ease}
+#name-modal.show{opacity:1;pointer-events:all}
+.modal-card{width:100%;background:var(--paper);border-radius:28px;padding:32px 28px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:modalPop .35s cubic-bezier(.34,1.4,.64,1) both}
+@keyframes modalPop{from{transform:scale(.88) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-icon{font-size:40px;text-align:center;margin-bottom:12px}
+.modal-title{font-family:'Shippori Mincho',serif;font-size:22px;font-weight:500;color:var(--charcoal);text-align:center;margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--ash);text-align:center;line-height:1.6;margin-bottom:24px;font-weight:300}
+.name-input-wrap{position:relative;margin-bottom:12px}
+.name-input{width:100%;padding:16px 50px 16px 18px;border:1.5px solid var(--fog);border-radius:16px;background:var(--white);font-family:'Zen Kaku Gothic New',sans-serif;font-size:16px;color:var(--charcoal);outline:none;transition:border-color .2s,box-shadow .2s}
+.name-input:focus{border-color:var(--moss);box-shadow:0 0 0 3px rgba(107,124,90,.12)}
+.name-input::placeholder{color:var(--ash)}
+.dice-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:22px;cursor:pointer;opacity:.6;transition:opacity .15s,transform .2s;-webkit-tap-highlight-color:transparent}
+.dice-btn:active{transform:translateY(-50%) rotate(180deg);opacity:1}
+.name-hint{font-size:11px;color:var(--ash);margin-bottom:24px;text-align:center}
+.name-hint span{color:var(--moss);cursor:pointer;text-decoration:underline}
+.modal-save{width:100%;padding:16px;background:var(--charcoal);color:var(--white);border:none;border-radius:16px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:15px;font-weight:500;letter-spacing:.06em;cursor:pointer;transition:all .15s;box-shadow:0 4px 16px rgba(61,58,55,.2)}
+.modal-save:active{transform:scale(.97)}
+.modal-skip{text-align:center;margin-top:14px;font-size:12px;color:var(--ash);cursor:pointer}
+
+/* ══════════════ HOME ══════════════ */
+#screen-home{background:var(--stone)}
+.home-bg{position:absolute;border-radius:50%;pointer-events:none}
+.hbg1{width:280px;height:280px;background:var(--moss);opacity:.06;top:-80px;right:-60px}
+.hbg2{width:200px;height:200px;background:var(--cedar);opacity:.05;bottom:80px;left:-60px}
+.home-hero{padding:24px 28px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;position:relative;z-index:1}
+.home-icon{width:68px;height:68px;background:linear-gradient(135deg,var(--moss),#4a5c3a);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:6px;box-shadow:0 8px 24px rgba(107,124,90,.35)}
+.home-name{font-family:'Shippori Mincho',serif;font-size:26px;font-weight:600;color:var(--charcoal);letter-spacing:.03em}
+.home-jp{font-size:12px;color:var(--moss);letter-spacing:.3em;font-weight:300}
+.player-badge{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--fog);border-radius:24px;padding:8px 16px 8px 10px;margin-top:10px;cursor:pointer;transition:all .2s;position:relative;z-index:1;-webkit-tap-highlight-color:transparent}
+.player-badge:active{transform:scale(.97)}
+.p-avatar{width:28px;height:28px;border-radius:50%;background:var(--moss);display:flex;align-items:center;justify-content:center;font-size:13px;color:white;font-weight:600}
+.p-name-text{font-size:13px;font-weight:500;color:var(--charcoal)}
+.p-edit{font-size:10px;color:var(--ash);margin-left:4px}
+.year-section{padding:0 24px 16px;position:relative;z-index:1}
+.year-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.year-btn{padding:12px 8px;border:1.5px solid var(--fog);border-radius:14px;background:var(--white);font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;color:var(--slate);text-align:center;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.year-btn:active{transform:scale(.96)}
+.year-btn.active{background:var(--moss);border-color:var(--moss);color:var(--white);font-weight:500;box-shadow:0 4px 12px rgba(107,124,90,.3)}
+.home-stats{padding:0 24px 16px;position:relative;z-index:1}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-card{padding:14px 10px;text-align:center}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--charcoal);line-height:1}
+.stat-lbl{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);margin-top:4px}
+.cta-wrap{padding:0 24px 24px;position:relative;z-index:1}
+.cta-btn{width:100%;padding:18px;background:var(--charcoal);color:var(--white);border:none;border-radius:18px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:15px;font-weight:500;letter-spacing:.06em;cursor:pointer;transition:all .2s;box-shadow:0 6px 20px rgba(61,58,55,.25);-webkit-tap-highlight-color:transparent}
+.cta-btn:active{transform:scale(.97);opacity:.9}
+
+/* ══════════════ QUIZ ══════════════ */
+#screen-quiz{background:#f4f6f2}
+.quiz-header{padding:16px 24px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.quiz-meta{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);font-family:'JetBrains Mono',monospace}
+.quiz-timer{font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--charcoal);transition:color .3s}
+.quiz-timer.pb-pace{color:var(--moss)}
+.progress-wrap{padding:0 24px 16px;flex-shrink:0}
+.progress-dots{display:flex;gap:4px}
+.pdot{flex:1;height:4px;background:var(--fog);border-radius:2px;transition:background .3s}
+.pdot.done{background:var(--moss)}
+.pdot.active{background:var(--moss-l)}
+.question-wrap{padding:0 24px 20px;flex-shrink:0}
+.question-card{padding:32px 24px;text-align:center}
+.q-label{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--ash);margin-bottom:14px;display:block;font-family:'JetBrains Mono',monospace}
+.q-text{font-family:'Shippori Mincho',serif;font-size:42px;font-weight:500;color:var(--charcoal);line-height:1.2}
+.options-wrap{padding:0 24px 24px;display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1}
+.opt-btn{padding:20px 10px;background:var(--white);border:1.5px solid var(--fog);border-radius:18px;font-family:'Shippori Mincho',serif;font-size:26px;color:var(--charcoal);text-align:center;cursor:pointer;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.04);-webkit-tap-highlight-color:transparent}
+.opt-btn:active{transform:scale(.96)}
+.opt-btn.correct{background:var(--moss);border-color:var(--moss);color:var(--white);box-shadow:0 4px 16px rgba(107,124,90,.35)}
+.opt-btn.wrong{background:var(--sakura);border-color:var(--sakura);color:var(--white);opacity:.75}
+.opt-btn.disabled{pointer-events:none}
+
+/* ══════════════ RESULTS ══════════════ */
+#screen-results{background:var(--stone);align-items:center}
+.results-content{width:100%;padding:20px 24px 32px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.result-badge{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 8px 28px rgba(196,154,90,.4);animation:badgePop .5s cubic-bezier(.34,1.56,.64,1) both}
+.badge-pb{background:linear-gradient(135deg,var(--amber),var(--cedar))}
+.badge-good{background:linear-gradient(135deg,var(--moss),#4a5c3a)}
+.badge-ok{background:linear-gradient(135deg,var(--slate),var(--charcoal))}
+@keyframes badgePop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.result-title{font-family:'Shippori Mincho',serif;font-size:20px;font-weight:500;color:var(--charcoal);text-align:center}
+.time-display{width:100%;padding:20px;text-align:center}
+.time-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--ash);margin-bottom:8px;display:block}
+.time-value{font-family:'JetBrains Mono',monospace;font-size:48px;color:var(--moss);animation:fadeUp .6s .2s ease both}
+.time-delta{font-size:12px;color:var(--amber);margin-top:6px;font-weight:500;animation:fadeUp .6s .35s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.result-stats{width:100%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.res-stat{padding:14px 8px;text-align:center}
+.res-stat-val{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--charcoal)}
+.res-stat-lbl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--ash);margin-top:4px}
+.upload-status{width:100%;padding:12px 16px;display:flex;align-items:center;gap:10px;border-radius:16px;display:none}
+.upload-status.show{display:flex}
+.us-uploading{background:var(--parchment);border:1px solid var(--fog)}
+.us-success{background:var(--moss-xl);border:1px solid #c0d0b8}
+.us-error{background:var(--sakura-l);border:1px solid #e8c0bc}
+.us-offline{background:var(--amber-l);border:1px solid #f0d090}
+.upload-icon{font-size:18px;flex-shrink:0}
+.upload-text{font-size:12px;font-weight:500;color:var(--charcoal)}
+.upload-sub{font-size:10px;color:var(--ash);margin-top:2px}
+.ach-row{width:100%;padding:14px 16px}
+.ach-title{font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--ash);font-family:'JetBrains Mono',monospace;margin-bottom:10px;display:block}
+.ach-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ach-chip{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;animation:chipPop .4s cubic-bezier(.34,1.56,.64,1) both}
+.ach-chip.gold{background:var(--amber-l);color:var(--amber);border:1px solid #f0d090}
+.ach-chip.green{background:var(--moss-xl);color:var(--moss);border:1px solid #c0d0b8}
+@keyframes chipPop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.result-btns{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.res-btn{padding:16px 10px;border-radius:16px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;font-weight:500;text-align:center;cursor:pointer;transition:all .15s;border:none;-webkit-tap-highlight-color:transparent}
+.res-btn:active{transform:scale(.96)}
+.res-btn.primary{background:var(--charcoal);color:var(--white);box-shadow:0 4px 14px rgba(61,58,55,.2)}
+.res-btn.secondary{background:var(--white);color:var(--charcoal);border:1px solid var(--fog)}
+
+/* ══════════════ RANKINGS ══════════════ */
+#screen-rankings{background:#f4f6f2}
+.rank-header{padding:20px 24px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.rank-filter{font-size:12px;color:var(--moss);font-weight:500;cursor:pointer;padding:6px 14px;border:1.5px solid var(--moss);border-radius:20px;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.rank-filter:active{background:var(--moss);color:white}
+.offline-banner{margin:0 24px 12px;padding:10px 16px;background:var(--amber-l);border:1px solid #f0d090;border-radius:14px;flex-shrink:0;display:none;align-items:center;gap:8px}
+.offline-banner.show{display:flex}
+.offline-banner span{font-size:11px;color:var(--charcoal);line-height:1.5}
+.podium-wrap{padding:0 24px 16px;flex-shrink:0}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;height:140px}
+.podium-col{display:flex;flex-direction:column;align-items:center;flex:1}
+.p-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:white;margin-bottom:6px;flex-shrink:0}
+.p-nm{font-size:10px;font-weight:500;color:var(--charcoal);margin-bottom:3px;text-align:center;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+.p-tm{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--slate);margin-bottom:4px}
+.p-block{width:100%;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-size:20px}
+.pc1 .p-av{background:linear-gradient(135deg,var(--amber),var(--cedar));width:48px;height:48px;font-size:19px}
+.pc1 .p-block{background:linear-gradient(180deg,#d4a84a,#b8893a);height:80px}
+.pc2 .p-av{background:linear-gradient(135deg,var(--ash),var(--slate))}
+.pc2 .p-block{background:linear-gradient(180deg,#9a9590,#7a7570);height:60px}
+.pc3 .p-av{background:linear-gradient(135deg,var(--cedar),#6b4f40)}
+.pc3 .p-block{background:linear-gradient(180deg,#a07060,#8b5f50);height:46px}
+.rank-list{padding:0 24px 24px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.rank-row{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-radius:16px}
+.rank-row.me{background:var(--moss-xl)!important;border:1.5px solid #b0c8a8!important}
+.rank-left{display:flex;align-items:center;gap:12px}
+.rk-num{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ash);width:22px;text-align:right;flex-shrink:0}
+.rk-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0}
+.rk-info{display:flex;flex-direction:column;gap:2px}
+.rk-player{font-size:13px;font-weight:500;color:var(--charcoal)}
+.rk-meta{font-size:10px;color:var(--ash);letter-spacing:.05em}
+.rk-right{display:flex;align-items:center;gap:6px}
+.rk-time{font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--moss)}
+.rk-crown{font-size:12px}
+.rank-loading{padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+.spin{font-size:32px;animation:spin 1.2s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rank-loading p{font-size:13px;color:var(--ash);line-height:1.7}
+.rank-empty{padding:40px 24px;text-align:center}
+.rank-empty .big{font-size:40px;margin-bottom:12px}
+.rank-empty p{font-size:13px;color:var(--ash);line-height:1.8}
+
+/* ══════════════ HISTORY ══════════════ */
+#screen-history{background:#f4f6f2}
+.hist-header{padding:20px 24px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.hist-filter{font-size:12px;color:var(--moss);font-weight:500;cursor:pointer;padding:6px 14px;border:1.5px solid var(--moss);border-radius:20px;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.hist-filter:active{background:var(--moss);color:white}
+.chart-card{margin:0 24px 16px;padding:16px}
+.chart-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--ash);margin-bottom:12px;display:block}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:80px}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;height:100%;justify-content:flex-end}
+.bar-fill{width:100%;border-radius:5px 5px 0 0;background:var(--fog);min-height:4px}
+.bar-fill.pb{background:var(--amber)}
+.bar-fill.latest{background:var(--moss)}
+.bar-day{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ash)}
+.chart-legend{display:flex;gap:16px;margin-top:10px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--ash)}
+.legend-dot{width:8px;height:8px;border-radius:2px}
+.session-list{padding:0 24px 24px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.session-row{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-radius:16px}
+.sess-l{display:flex;flex-direction:column;gap:3px}
+.sess-date{font-size:13px;font-weight:500;color:var(--charcoal)}
+.sess-meta{font-size:10px;color:var(--ash)}
+.sess-r{display:flex;align-items:center;gap:6px}
+.sess-time{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--moss)}
+.sess-pb{font-size:9px;background:var(--amber-l);color:var(--amber);border-radius:8px;padding:3px 8px;font-weight:600}
+.no-sessions{padding:40px 24px;text-align:center;color:var(--ash);font-size:13px;line-height:1.8}
+.no-sessions .big{font-size:36px;margin-bottom:12px}
+
+/* ══════════════ CALENDAR ══════════════ */
+#screen-calendar{background:var(--stone)}
+.cal-header{padding:20px 24px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cal-month{font-family:'Shippori Mincho',serif;font-size:20px;font-weight:500;color:var(--charcoal)}
+.cal-nav{display:flex;gap:16px}
+.cal-nav-btn{width:32px;height:32px;border-radius:50%;background:var(--white);border:1px solid var(--fog);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--slate);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.cal-nav-btn:active{background:var(--fog)}
+.cal-grid-wrap{padding:0 24px 16px;flex-shrink:0}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
+.cal-wd{text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);padding:4px 0}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-day{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--slate);position:relative}
+.cal-day.played{background:var(--moss);color:var(--white);font-weight:500}
+.cal-day.today{background:var(--charcoal);color:var(--white);font-weight:700}
+.cal-day.pb::after{content:'★';position:absolute;font-size:6px;top:2px;right:3px;color:var(--amber)}
+.cal-day.played.pb::after{color:#ffd680}
+.cal-day.empty{opacity:0;pointer-events:none}
+.cal-cards{padding:0 24px 24px;display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+.streak-card{padding:16px 20px;display:flex;align-items:center;gap:16px}
+.streak-icon{font-size:28px}
+.streak-num{font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--amber);line-height:1}
+.streak-txt{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);margin-top:2px}
+.last-card{padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.last-lbl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);font-family:'JetBrains Mono',monospace;margin-bottom:4px;display:block}
+.last-val{font-size:13px;font-weight:500;color:var(--charcoal)}
+.last-ago{font-size:10px;letter-spacing:.1em;color:var(--moss);text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+
+/* Toast */
+#toast{position:absolute;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--charcoal);color:var(--white);font-size:13px;font-weight:500;padding:12px 22px;border-radius:24px;opacity:0;transition:all .3s ease;z-index:500;white-space:nowrap;pointer-events:none;max-width:340px}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+#desktop-hint{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.2);pointer-events:none;white-space:nowrap}
+@media(max-width:420px){
+  #app-shell{width:100vw;height:100dvh;border-radius:0;top:0;left:0;transform:none}
+  #desktop-hint{display:none}
+  #screens{height:calc(100dvh - 44px - 82px)}
+}
+</style>
+</head>
+<body>
+
+<div id="app-shell">
+  <div id="dynamic-island"></div>
+  <div id="status-bar">
+    <span class="s-time" id="clock">9:41</span>
+    <span class="s-icons">▲▲▲ ⬛</span>
+  </div>
+
+  <div id="screens">
+
+    <!-- HOME -->
+    <div id="screen-home" class="screen active">
+      <div class="home-bg hbg1"></div><div class="home-bg hbg2"></div>
+      <div class="home-hero">
+        <div class="home-icon">🌿</div>
+        <div class="home-name">Yenda Math</div>
+        <div class="home-jp">算数の練習</div>
+        <div class="player-badge" id="playerBadge" onclick="showNameModal()">
+          <div class="p-avatar p-av" id="homeAvatar">?</div>
+          <span class="p-name-text" id="homeNameText">Set your name</span>
+          <span class="p-edit">✎</span>
+        </div>
+      </div>
+      <div class="year-section">
+        <span class="section-lbl">Select Your Year</span>
+        <div class="year-grid" id="yearGrid">
+          <div class="year-btn" data-year="1">Year 1</div>
+          <div class="year-btn" data-year="2">Year 2</div>
+          <div class="year-btn" data-year="3">Year 3</div>
+          <div class="year-btn active" data-year="4">Year 4</div>
+          <div class="year-btn" data-year="5">Year 5</div>
+          <div class="year-btn" data-year="6">Year 6</div>
+        </div>
+      </div>
+      <div class="home-stats">
+        <span class="section-lbl">Your Progress</span>
+        <div class="stats-row">
+          <div class="stat-card card"><div class="stat-val" id="st-sessions">0</div><div class="stat-lbl">Sessions</div></div>
+          <div class="stat-card card"><div class="stat-val" id="st-pb">—</div><div class="stat-lbl">Best Time</div></div>
+          <div class="stat-card card"><div class="stat-val" id="st-streak">0</div><div class="stat-lbl">Streak</div></div>
+        </div>
+      </div>
+      <div class="cta-wrap">
+        <button class="cta-btn" id="startBtn">Begin Today's Practice →</button>
+      </div>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="screen-quiz" class="screen">
+      <div class="quiz-header">
+        <span class="quiz-meta" id="quizMeta">Year 4 · Q 1 of 20</span>
+        <span class="quiz-timer" id="quizTimer">0:00</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-dots" id="progressDots"></div></div>
+      <div class="question-wrap">
+        <div class="question-card card">
+          <span class="q-label">What is the answer?</span>
+          <div class="q-text" id="questionText">7 × 8 = ?</div>
+        </div>
+      </div>
+      <div class="options-wrap" id="optionsWrap"></div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="screen-results" class="screen">
+      <div class="results-content">
+        <div class="result-badge" id="resultBadge">⭐</div>
+        <div class="result-title" id="resultTitle">Session Complete</div>
+        <div class="time-display card" style="width:100%">
+          <span class="time-label">Your Time</span>
+          <div class="time-value" id="resultTime">0:00</div>
+          <div class="time-delta" id="resultDelta"></div>
+        </div>
+        <div class="result-stats">
+          <div class="res-stat card"><div class="res-stat-val" id="rs-correct">—</div><div class="res-stat-lbl">Correct</div></div>
+          <div class="res-stat card"><div class="res-stat-val" id="rs-acc">—</div><div class="res-stat-lbl">Accuracy</div></div>
+          <div class="res-stat card"><div class="res-stat-val" id="rs-avg">—</div><div class="res-stat-lbl">Avg / Q</div></div>
+        </div>
+        <div class="upload-status" id="uploadStatus">
+          <div class="upload-icon" id="uploadIcon">⏳</div>
+          <div><div class="upload-text" id="uploadText">Uploading…</div><div class="upload-sub" id="uploadSub"></div></div>
+        </div>
+        <div class="ach-row card" id="achRow" style="display:none">
+          <span class="ach-title">Achievements Unlocked</span>
+          <div class="ach-chips" id="achChips"></div>
+        </div>
+        <div class="result-btns">
+          <button class="res-btn primary" id="playAgainBtn">Play Again</button>
+          <button class="res-btn secondary" id="viewRankBtn">🏆 Rankings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RANKINGS -->
+    <div id="screen-rankings" class="screen">
+      <div class="rank-header">
+        <div>
+          <div class="screen-subtitle" style="margin-bottom:4px">Global</div>
+          <div class="screen-title">Rankings</div>
+        </div>
+        <div class="rank-filter" id="rankFilter">Year 4 ▾</div>
+      </div>
+      <div class="offline-banner" id="offlineBanner">
+        <span>⚠️</span>
+        <span>Firebase not set up yet. <strong>See setup steps below</strong> to enable global rankings.</span>
+      </div>
+      <div class="podium-wrap"><div class="podium" id="podium"></div></div>
+      <div class="rank-list" id="rankList">
+        <div class="rank-loading"><div class="spin">🌿</div><p>Loading rankings…</p></div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="screen-history" class="screen">
+      <div class="hist-header">
+        <div>
+          <div class="screen-subtitle" style="margin-bottom:4px">Performance</div>
+          <div class="screen-title">My Times</div>
+        </div>
+        <div class="hist-filter" id="histFilter">Year 4 ▾</div>
+      </div>
+      <div class="chart-card card">
+        <span class="chart-lbl">Last 7 Sessions — shorter bar = faster time</span>
+        <div class="chart-bars" id="chartBars"></div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Personal Best</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--moss)"></div>Most Recent</div>
+        </div>
+      </div>
+      <div class="session-list" id="sessionList"></div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div id="screen-calendar" class="screen">
+      <div class="cal-header">
+        <div class="cal-month" id="calMonth">April 2026</div>
+        <div class="cal-nav">
+          <div class="cal-nav-btn" id="calPrev">‹</div>
+          <div class="cal-nav-btn" id="calNext">›</div>
+        </div>
+      </div>
+      <div class="cal-grid-wrap">
+        <div class="cal-weekdays">
+          <div class="cal-wd">M</div><div class="cal-wd">T</div><div class="cal-wd">W</div>
+          <div class="cal-wd">T</div><div class="cal-wd">F</div><div class="cal-wd">S</div><div class="cal-wd">S</div>
+        </div>
+        <div class="cal-days" id="calDays"></div>
+      </div>
+      <div class="cal-cards">
+        <div class="streak-card card">
+          <div class="streak-icon">🔥</div>
+          <div><div class="streak-num" id="streakNum">0</div><div class="streak-txt">Day Streak</div></div>
+        </div>
+        <div class="last-card card">
+          <div><span class="last-lbl">Last Session</span><div class="last-val" id="lastVal">No sessions yet</div></div>
+          <div class="last-ago" id="lastAgo"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+
+  <div id="tab-bar">
+    <div class="tab active" data-screen="home"><div class="tab-icon">🏠</div><div class="tab-label">Home</div></div>
+    <div class="tab" data-screen="quiz"><div class="tab-icon">✏️</div><div class="tab-label">Quiz</div></div>
+    <div class="tab" data-screen="rankings"><div class="tab-icon">🏆</div><div class="tab-label">Rankings</div></div>
+    <div class="tab" data-screen="history"><div class="tab-icon">📊</div><div class="tab-label">History</div></div>
+    <div class="tab" data-screen="calendar"><div class="tab-icon">📅</div><div class="tab-label">Calendar</div></div>
+  </div>
+
+  <!-- NAME MODAL -->
+  <div id="name-modal">
+    <div class="modal-card">
+      <div class="modal-icon">👤</div>
+      <div class="modal-title">What's your name?</div>
+      <div class="modal-sub">Your name appears on the<br>global rankings board.</div>
+      <div class="name-input-wrap">
+        <input class="name-input" id="nameInput" type="text" placeholder="Enter your name…" maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false">
+        <div class="dice-btn" id="diceBtn" title="Random name">🎲</div>
+      </div>
+      <div class="name-hint">or <span id="randomLink">pick a random name</span> for me</div>
+      <button class="modal-save" id="saveNameBtn">Save & Play →</button>
+      <div class="modal-skip" id="skipBtn">Skip for now</div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+<div id="desktop-hint">Yenda Math · 算数の練習</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+let playerName   = localStorage.getItem('ym_name') || '';
+let playerId     = localStorage.getItem('ym_pid')  || mkId();
+let selYear      = parseInt(localStorage.getItem('ym_year') || '4');
+let sessions     = JSON.parse(localStorage.getItem('ym_sessions') || '[]');
+let achievements = JSON.parse(localStorage.getItem('ym_ach') || '[]');
+let calDate      = new Date();
+let histYear     = selYear;
+let rankYear     = selYear;
+
+let qList=[], qIdx=0, qCorrect=0, qStart=0, qElapsed=0, qTimerInt=null, qAnswered=false;
+
+function save(){
+  localStorage.setItem('ym_name', playerName);
+  localStorage.setItem('ym_pid',  playerId);
+  localStorage.setItem('ym_year', selYear);
+  localStorage.setItem('ym_sessions', JSON.stringify(sessions));
+  localStorage.setItem('ym_ach', JSON.stringify(achievements));
+}
+function mkId(){ const id=Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem('ym_pid',id); return id; }
+
+/* ══════════════════════════════════════════════
+   RANDOM NAMES
+══════════════════════════════════════════════ */
+const ADJ=['Swift','Calm','Bright','Clever','Nimble','Sage','Quick','Bold','Keen','Sharp','Gentle','Warm','Quiet','Brave','Lucky','Sunny'];
+const NOU=['Panda','Koala','Kite','River','Maple','Cloud','Stone','Crane','Ember','Cedar','Fern','Lotus','Wren','Finch','Dingo','Bilby'];
+const rndName=()=>ADJ[Math.floor(Math.random()*ADJ.length)]+' '+NOU[Math.floor(Math.random()*NOU.length)];
+
+/* ══════════════════════════════════════════════
+   NAME MODAL
+══════════════════════════════════════════════ */
+function showNameModal(){
+  document.getElementById('nameInput').value = playerName||'';
+  document.getElementById('name-modal').classList.add('show');
+  setTimeout(()=>document.getElementById('nameInput').focus(),320);
+}
+function hideNameModal(){ document.getElementById('name-modal').classList.remove('show'); }
+function applyName(n){ playerName=n.trim()||rndName(); save(); refreshNameUI(); hideNameModal(); }
+function refreshNameUI(){
+  const nm = playerName||'Set your name';
+  document.getElementById('homeNameText').textContent = nm;
+  document.getElementById('homeAvatar').textContent = playerName ? playerName.charAt(0).toUpperCase() : '?';
+}
+
+document.getElementById('diceBtn').onclick = ()=>{ document.getElementById('nameInput').value=rndName(); };
+document.getElementById('randomLink').onclick = ()=>{ document.getElementById('nameInput').value=rndName(); };
+document.getElementById('saveNameBtn').onclick = ()=>applyName(document.getElementById('nameInput').value||rndName());
+document.getElementById('skipBtn').onclick = ()=>{ if(!playerName) playerName=rndName(); save(); refreshNameUI(); hideNameModal(); };
+document.getElementById('nameInput').addEventListener('keydown',e=>{ if(e.key==='Enter') applyName(document.getElementById('nameInput').value||rndName()); });
+document.getElementById('name-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('name-modal')) hideNameModal(); });
+
+/* ══════════════════════════════════════════════
+   FIREBASE UPLOAD
+══════════════════════════════════════════════ */
+async function uploadScore(session){
+  const el=document.getElementById('uploadStatus');
+  el.classList.add('show');
+  if(!window._fb){
+    el.className='upload-status show us-offline';
+    document.getElementById('uploadIcon').textContent='📴';
+    document.getElementById('uploadText').textContent='Offline mode';
+    document.getElementById('uploadSub').textContent='Configure Firebase to enable rankings';
+    return;
+  }
+  el.className='upload-status show us-uploading';
+  document.getElementById('uploadIcon').textContent='⏳';
+  document.getElementById('uploadText').textContent='Uploading to rankings…';
+  document.getElementById('uploadSub').textContent='Just a moment';
+  try{
+    const {db,ref,push} = window._fb;
+    await push(ref(db,`scores/year${session.year}`),{
+      playerId, playerName: playerName||'Anonymous',
+      year:session.year, correct:session.correct, total:session.total,
+      duration:Math.round(session.duration*10)/10,
+      accuracy:Math.round(session.correct/session.total*100),
+      date:new Date(session.date).toISOString(), timestamp:Date.now()
+    });
+    el.className='upload-status show us-success';
+    document.getElementById('uploadIcon').textContent='✅';
+    document.getElementById('uploadText').textContent='Score posted to rankings!';
+    document.getElementById('uploadSub').textContent=`${playerName||'You'} is on the leaderboard`;
+  }catch(err){
+    el.className='upload-status show us-error';
+    document.getElementById('uploadIcon').textContent='⚠️';
+    document.getElementById('uploadText').textContent='Upload failed';
+    document.getElementById('uploadSub').textContent='Score saved locally · '+err.message;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   LOAD RANKINGS
+══════════════════════════════════════════════ */
+async function loadRankings(){
+  const list=document.getElementById('rankList');
+  const pod=document.getElementById('podium');
+  const banner=document.getElementById('offlineBanner');
+  if(!window._fb){
+    banner.classList.add('show');
+    pod.innerHTML='';
+    list.innerHTML=`<div class="rank-empty"><div class="big">🔌</div><p>Firebase not connected.<br>Follow the setup guide below<br>to enable global rankings.</p></div>`;
+    return;
+  }
+  banner.classList.remove('show');
+  list.innerHTML=`<div class="rank-loading"><div class="spin">🌿</div><p>Loading rankings…</p></div>`;
+  pod.innerHTML='';
+  try{
+    const {db,ref,query,orderByChild,limitToLast,get}=window._fb;
+    const snap=await get(query(ref(db,`scores/year${rankYear}`),orderByChild('duration'),limitToLast(200)));
+    if(!snap.exists()){
+      list.innerHTML=`<div class="rank-empty"><div class="big">🌿</div><p>No scores yet for Year ${rankYear}.<br>Be the first on the board!</p></div>`;
+      return;
+    }
+    const all=[]; snap.forEach(c=>all.push({...c.val()}));
+    // Best per player
+    const best={};
+    all.forEach(e=>{ const k=e.playerId||e.playerName; if(!best[k]||e.duration<best[k].duration) best[k]=e; });
+    const ranked=Object.values(best).sort((a,b)=>a.duration-b.duration).slice(0,20);
+    buildPodium(ranked.slice(0,3));
+    list.innerHTML='';
+    ranked.forEach((e,i)=>{
+      const me=e.playerId===playerId;
+      const row=document.createElement('div');
+      row.className='rank-row card'+(me?' me':'');
+      row.innerHTML=`<div class="rank-left"><div class="rk-num">${i+1}</div><div class="rk-av" style="background:${avColor(e.playerName)}">${(e.playerName||'?').charAt(0).toUpperCase()}</div><div class="rk-info"><div class="rk-player">${esc(e.playerName||'Anonymous')}${me?' 👈':''}</div><div class="rk-meta">Year ${e.year} · ${e.accuracy}% · ${new Date(e.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</div></div></div><div class="rk-right"><div class="rk-time">${fmt(e.duration)}</div>${i===0?'<div class="rk-crown">👑</div>':''}</div>`;
+      list.appendChild(row);
+    });
+  }catch(err){
+    list.innerHTML=`<div class="rank-empty"><div class="big">⚠️</div><p>Error loading: ${err.message}</p></div>`;
+  }
+}
+
+function buildPodium(top){
+  const pod=document.getElementById('podium'); pod.innerHTML='';
+  if(!top.length) return;
+  const order=top.length>=2?[top[1],top[0],top[2]].filter(Boolean):[top[0]];
+  const cls=top.length>=2?['pc2','pc1','pc3']:['pc1'];
+  const medals=['🥇','🥈','🥉'];
+  const idxMap=top.length>=2?[1,0,2]:[0];
+  order.forEach((e,i)=>{
+    const col=document.createElement('div'); col.className='podium-col '+cls[i];
+    col.innerHTML=`<div class="p-av" style="background:${avColor(e.playerName)}">${(e.playerName||'?').charAt(0).toUpperCase()}</div><div class="p-nm" title="${esc(e.playerName||'?')}">${esc(e.playerName||'?')}</div><div class="p-tm">${fmt(e.duration)}</div><div class="p-block">${medals[idxMap[i]]}</div>`;
+    pod.appendChild(col);
+  });
+}
+
+function avColor(n){
+  const cols=['#6b7c5a','#8b6f5e','#7a9baa','#9a7a6a','#5a7a6a','#8a6a9a','#7a8a5a'];
+  let h=0; for(const c of(n||'?')) h=(h*31+c.charCodeAt(0))&0xffffffff;
+  return cols[Math.abs(h)%cols.length];
+}
+
+/* ══════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════ */
+function navigate(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.screen===id));
+  const sc=document.getElementById('screen-'+id);
+  if(sc){sc.classList.add('active');sc.scrollTop=0;}
+  if(id==='history')  renderHistory();
+  if(id==='calendar') renderCalendar();
+  if(id==='home')     renderHomeStats();
+  if(id==='rankings'){rankYear=selYear;document.getElementById('rankFilter').textContent=`Year ${rankYear} ▾`;loadRankings();}
+}
+
+/* ══════════════════════════════════════════════
+   HOME
+══════════════════════════════════════════════ */
+function renderHomeStats(){
+  const ys=sessions.filter(s=>s.year===selYear);
+  const pb=ys.length?Math.min(...ys.map(s=>s.duration)):null;
+  document.getElementById('st-sessions').textContent=ys.length;
+  document.getElementById('st-pb').textContent=pb?fmt(pb):'—';
+  document.getElementById('st-streak').textContent=calcStreak();
+}
+document.getElementById('yearGrid').addEventListener('click',e=>{
+  const b=e.target.closest('.year-btn'); if(!b) return;
+  selYear=parseInt(b.dataset.year); histYear=selYear;
+  document.querySelectorAll('.year-btn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); save(); renderHomeStats();
+});
+document.getElementById('startBtn').addEventListener('click',()=>{
+  if(!playerName){showNameModal();return;}
+  startQuiz(); navigate('quiz');
+});
+
+/* ══════════════════════════════════════════════
+   QUIZ
+══════════════════════════════════════════════ */
+function startQuiz(){
+  qList=genQs(selYear); qIdx=0; qCorrect=0; qElapsed=0; qAnswered=false;
+  qStart=Date.now(); clearInterval(qTimerInt);
+  qTimerInt=setInterval(()=>{
+    qElapsed=(Date.now()-qStart)/1000;
+    const el=document.getElementById('quizTimer'); el.textContent=fmt(qElapsed);
+    const ys=sessions.filter(s=>s.year===selYear);
+    el.classList.toggle('pb-pace',ys.length&&qElapsed<Math.min(...ys.map(s=>s.duration)));
+  },100);
+  renderDots(); renderQ();
+}
+function renderDots(){
+  const w=document.getElementById('progressDots'); w.innerHTML='';
+  for(let i=0;i<20;i++){const d=document.createElement('div');d.className='pdot'+(i<qIdx?' done':i===qIdx?' active':'');w.appendChild(d);}
+}
+function renderQ(){
+  const q=qList[qIdx];
+  document.getElementById('quizMeta').textContent=`Year ${selYear} · Q ${qIdx+1} of 20`;
+  document.getElementById('questionText').textContent=q.question;
+  const w=document.getElementById('optionsWrap'); w.innerHTML=''; qAnswered=false;
+  q.options.forEach(o=>{
+    const b=document.createElement('div'); b.className='opt-btn'; b.textContent=o;
+    b.addEventListener('click',()=>{
+      if(qAnswered) return; qAnswered=true;
+      if(o===q.correct) qCorrect++;
+      document.querySelectorAll('.opt-btn').forEach(x=>{ x.classList.add('disabled'); if(x.textContent===q.correct) x.classList.add('correct'); else if(x===b&&o!==q.correct) x.classList.add('wrong'); });
+      setTimeout(()=>{ qIdx++; qIdx>=20?finishQuiz():(renderDots(),renderQ()); },700);
+    });
+    w.appendChild(b);
+  });
+}
+async function finishQuiz(){
+  clearInterval(qTimerInt);
+  const dur=qElapsed;
+  const ys=sessions.filter(s=>s.year===selYear);
+  const prevPB=ys.length?Math.min(...ys.map(s=>s.duration)):null;
+  const isPB=!prevPB||dur<prevPB;
+  const session={id:Date.now(),date:new Date().toISOString(),year:selYear,correct:qCorrect,total:20,duration:dur,isPB};
+  sessions.unshift(session);
+  const newAchs=checkAch(session,sessions);
+  save();
+  // Results UI
+  const badge=document.getElementById('resultBadge');
+  const title=document.getElementById('resultTitle');
+  if(isPB&&prevPB){badge.className='result-badge badge-pb';badge.textContent='⭐';title.textContent='New Personal Best!';}
+  else if(qCorrect>=18){badge.className='result-badge badge-good';badge.textContent='🌿';title.textContent='Excellent Work!';}
+  else{badge.className='result-badge badge-ok';badge.textContent='📖';title.textContent='Session Complete';}
+  document.getElementById('resultTime').textContent=fmt(dur);
+  const dl=document.getElementById('resultDelta');
+  if(isPB&&prevPB){dl.textContent=`↓ ${fmt(prevPB-dur)} faster than your best`;dl.style.color='var(--amber)';}
+  else if(prevPB){dl.textContent=`↑ ${fmt(dur-prevPB)} off your best of ${fmt(prevPB)}`;dl.style.color='var(--ash)';}
+  else{dl.textContent='First session — this is your new best!';dl.style.color='var(--moss)';}
+  document.getElementById('rs-correct').textContent=`${qCorrect}/20`;
+  document.getElementById('rs-acc').textContent=`${Math.round(qCorrect/20*100)}%`;
+  document.getElementById('rs-avg').textContent=`${Math.round(dur/20)}s`;
+  document.getElementById('uploadStatus').classList.remove('show');
+  const ar=document.getElementById('achRow'); const ac=document.getElementById('achChips');
+  if(newAchs.length){ar.style.display='block';ac.innerHTML='';newAchs.forEach((a,i)=>{const c=document.createElement('div');c.className='ach-chip '+(a.type==='gold'?'gold':'green');c.style.animationDelay=(i*.1)+'s';c.textContent=a.label;ac.appendChild(c);});}
+  else ar.style.display='none';
+  navigate('results');
+  uploadScore(session);
+}
+document.getElementById('playAgainBtn').addEventListener('click',()=>{startQuiz();navigate('quiz');});
+document.getElementById('viewRankBtn').addEventListener('click',()=>navigate('rankings'));
+
+/* ══════════════════════════════════════════════
+   ACHIEVEMENTS
+══════════════════════════════════════════════ */
+function checkAch(s,all){
+  const new_=[]; const ys=all.filter(x=>x.year===s.year);
+  const ck=(id,label,type,cond)=>{ if(!achievements.includes(id)&&cond){achievements.push(id);new_.push({label,type});}};
+  ck('pb'+s.year,'🏆 Speed Star','gold',s.isPB&&ys.length>1);
+  ck('perf'+s.year+s.correct,'✨ Perfect Score','gold',s.correct===20);
+  const st=calcStreak();
+  ck('s3','🔥 3-Day Streak','green',st>=3); ck('s7','🔥 7-Day Streak','gold',st>=7);
+  ck('y'+s.year,`📖 Year ${s.year} Started`,'green',ys.length===1);
+  ck('c100','💯 Century','gold',all.length>=100);
+  ck('eb','🌅 Early Bird','green',new Date(s.date).getHours()<8);
+  ck('acc90','🎯 Sharp Solver','green',s.correct>=18);
+  return new_;
+}
+
+/* ══════════════════════════════════════════════
+   HISTORY
+══════════════════════════════════════════════ */
+function renderHistory(){
+  const f=sessions.filter(s=>s.year===histYear);
+  document.getElementById('histFilter').textContent=`Year ${histYear} ▾`;
+  const cb=document.getElementById('chartBars'); cb.innerHTML='';
+  const cd=f.slice(0,7).reverse();
+  const pbD=f.length?Math.min(...f.map(s=>s.duration)):null;
+  if(cd.length){
+    const maxD=Math.max(...cd.map(s=>s.duration)),minD=Math.min(...cd.map(s=>s.duration));
+    cd.forEach((s,i)=>{
+      const col=document.createElement('div'); col.className='bar-col';
+      const fill=document.createElement('div'); fill.className='bar-fill';
+      if(s.duration===pbD) fill.classList.add('pb'); else if(i===cd.length-1) fill.classList.add('latest');
+      fill.style.height=(20+((s.duration-minD)/(maxD-minD||1))*75)+'%';
+      const day=document.createElement('div'); day.className='bar-day';
+      day.textContent=['S','M','T','W','T','F','S'][new Date(s.date).getDay()];
+      col.appendChild(fill); col.appendChild(day); cb.appendChild(col);
+    });
+  } else cb.innerHTML='<div style="color:var(--ash);font-size:12px;padding:20px;text-align:center">No sessions yet</div>';
+  const sl=document.getElementById('sessionList'); sl.innerHTML='';
+  if(!f.length){sl.innerHTML=`<div class="no-sessions"><div class="big">📖</div>No Year ${histYear} sessions yet.</div>`;return;}
+  f.slice(0,20).forEach(s=>{
+    const row=document.createElement('div'); row.className='session-row card';
+    row.innerHTML=`<div class="sess-l"><div class="sess-date">${relDate(new Date(s.date))}</div><div class="sess-meta">Year ${s.year} · ${s.correct}/20 correct</div></div><div class="sess-r"><div class="sess-time">${fmt(s.duration)}</div>${s.isPB?'<div class="sess-pb">PB</div>':''}</div>`;
+    sl.appendChild(row);
+  });
+}
+document.getElementById('histFilter').addEventListener('click',()=>{ histYear=histYear>=6?1:histYear+1; renderHistory(); });
+
+/* ══════════════════════════════════════════════
+   CALENDAR
+══════════════════════════════════════════════ */
+function renderCalendar(){
+  const y=calDate.getFullYear(),m=calDate.getMonth();
+  const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonth').textContent=`${MN[m]} ${y}`;
+  const todayKey=dKey(new Date()); const pd={};
+  sessions.forEach(s=>{ const d=new Date(s.date); if(d.getFullYear()===y&&d.getMonth()===m){const k=d.getDate();if(!pd[k])pd[k]={played:true,pb:false};if(s.isPB)pd[k].pb=true;} });
+  const first=new Date(y,m,1).getDay(),off=first===0?6:first-1,dim=new Date(y,m+1,0).getDate();
+  const grid=document.getElementById('calDays'); grid.innerHTML='';
+  for(let i=0;i<off;i++){const e=document.createElement('div');e.className='cal-day empty';e.textContent='.';grid.appendChild(e);}
+  for(let d=1;d<=dim;d++){
+    const cell=document.createElement('div');
+    const isT=dKey(new Date(y,m,d))===todayKey;
+    let cls='cal-day';
+    if(pd[d]) cls+=' played'; if(isT) cls+=' today'; if(pd[d]?.pb) cls+=' pb';
+    cell.className=cls; cell.textContent=d; grid.appendChild(cell);
+  }
+  document.getElementById('streakNum').textContent=calcStreak();
+  if(sessions.length){
+    const last=sessions[0],d=new Date(last.date);
+    document.getElementById('lastVal').textContent=`${relDate(d)} · ${fmt(last.duration)} · Year ${last.year}`;
+    document.getElementById('lastAgo').textContent=timeAgo(d);
+  } else { document.getElementById('lastVal').textContent='No sessions yet'; document.getElementById('lastAgo').textContent=''; }
+}
+document.getElementById('calPrev').addEventListener('click',()=>{ calDate.setMonth(calDate.getMonth()-1); renderCalendar(); });
+document.getElementById('calNext').addEventListener('click',()=>{ calDate.setMonth(calDate.getMonth()+1); renderCalendar(); });
+
+/* ══════════════════════════════════════════════
+   TAB BAR
+══════════════════════════════════════════════ */
+document.getElementById('tab-bar').addEventListener('click',e=>{
+  const t=e.target.closest('.tab'); if(!t) return;
+  const id=t.dataset.screen;
+  if(id==='quiz'){if(!playerName){showNameModal();return;}startQuiz();}
+  navigate(id);
+});
+document.getElementById('rankFilter').addEventListener('click',()=>{ rankYear=rankYear>=6?1:rankYear+1; document.getElementById('rankFilter').textContent=`Year ${rankYear} ▾`; loadRankings(); });
+
+/* ══════════════════════════════════════════════
+   QUESTION BANK
+══════════════════════════════════════════════ */
+function genQs(yr,n=20){const qs=[],g=getGens(yr);for(let i=0;i<n;i++)qs.push(g[Math.floor(Math.random()*g.length)]());return qs;}
+function mkQ(q,correct,topic,dist){const opts=[correct,...dist.slice(0,3)];for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}return{question:q,correct:String(correct),options:opts.map(String),topic};}
+function getGens(yr){
+  const r=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  if(yr<=2)return[
+    ()=>{const a=r(1,10),b=r(1,10);return mkQ(`${a} + ${b} = ?`,a+b,'Add',[a+b-1,a+b+1,a+b+2]);},
+    ()=>{const a=r(5,15),b=r(1,a);return mkQ(`${a} − ${b} = ?`,a-b,'Sub',[a-b-1,a-b+1,a-b+2]);},
+    ()=>{const a=r(1,10);return mkQ(`${a} + ${a} = ?`,a*2,'Doubles',[a*2-1,a*2+1,a*2+2]);},
+    ()=>{const a=r(10,20),b=r(1,9);return mkQ(`${a} + ${b} = ?`,a+b,'Add',[a+b-1,a+b+1,a+b-2]);},
+  ];
+  if(yr===3)return[
+    ()=>{const b=[2,5,10][r(0,2)],a=r(1,12);return mkQ(`${a} × ${b} = ?`,a*b,'Tables',[a*b-b,a*b+b,a*b+2*b]);},
+    ()=>{const a=r(100,999),b=r(10,99);return mkQ(`${a} + ${b} = ?`,a+b,'Place',[a+b-1,a+b+1,a+b-10]);},
+    ()=>{const a=r(50,200),b=r(10,a);return mkQ(`${a} − ${b} = ?`,a-b,'Sub',[a-b-1,a-b+1,a-b+10]);},
+    ()=>{const n=r(2,20)*2;return mkQ(`½ of ${n} = ?`,n/2,'Fractions',[n/2-1,n/2+1,n/2+2]);},
+  ];
+  if(yr===4)return[
+    ()=>{const a=r(2,12),b=r(2,12);return mkQ(`${a} × ${b} = ?`,a*b,'Tables',[a*b-a,a*b+a,a*b+b]);},
+    ()=>{const b=r(2,9),a=b*r(2,12);return mkQ(`${a} ÷ ${b} = ?`,a/b,'Div',[a/b-1,a/b+1,a/b+2]);},
+    ()=>{const l=r(3,12),w=r(2,8);return mkQ(`Area: ${l} × ${w} = ?`,l*w,'Area',[l*w-l,l*w+w,l*w-w]);},
+    ()=>{const l=r(3,12),w=r(2,8);return mkQ(`Perimeter: 2×(${l}+${w}) = ?`,2*(l+w),'Perim',[2*(l+w)-2,2*(l+w)+2,l+w]);},
+    ()=>{const a=r(100,999),b=r(100,999);return mkQ(`${a} + ${b} = ?`,a+b,'Add',[a+b-1,a+b+1,a+b-10]);},
+  ];
+  if(yr===5)return[
+    ()=>{const a=r(11,50),b=r(11,50);return mkQ(`${a} × ${b} = ?`,a*b,'Mult',[a*b-a,a*b+b,a*b-b]);},
+    ()=>{const p=[10,20,25,50][r(0,3)],a=r(2,20)*10;return mkQ(`${p}% of ${a} = ?`,p*a/100,'Pct',[p*a/100-5,p*a/100+5,p*a/100+10]);},
+    ()=>{const a=r(2,8),b=r(2,8),c=r(2,5);return mkQ(`${a} + ${b} × ${c} = ?`,a+b*c,'BODMAS',[a+b*c-1,(a+b)*c,a+b*c+c]);},
+    ()=>{const a=r(1,9);return mkQ(`${a}² = ?`,a*a,'Powers',[a*a-a,a*a+a,(a+1)*(a+1)]);},
+  ];
+  return[
+    ()=>{const x=r(2,8),b=r(1,15),tot=x*r(2,6)+b;return mkQ(`If 3x + ${b} = ${tot}, x = ?`,(tot-b)/3,'Algebra',[(tot-b)/3+1,(tot-b)/3-1,(tot-b)/3+2]);},
+    ()=>{const ns=[r(2,15),r(2,15),r(2,15),r(2,15),r(2,15)];const mn=Math.round(ns.reduce((a,b)=>a+b,0)/5);return mkQ(`Mean of ${ns.join(', ')} = ?`,mn,'Stats',[mn+1,mn-1,ns[0]]);},
+    ()=>{const p=r(2,9)*10,a=r(100,1000);return mkQ(`${p}% of ${a} = ?`,p*a/100,'Pct',[p*a/100+10,p*a/100-10,p*a/200]);},
+    ()=>{const a=r(2,8),b=r(2,6);return mkQ(`${a}(${b} + 3) = ?`,a*(b+3),'Algebra',[a*b+3,a*(b+3)+a,a*(b+3)-1]);},
+  ];
+}
+
+/* ══════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════ */
+function fmt(s){const abs=Math.abs(s),m=Math.floor(abs/60),ss=Math.floor(abs%60);return`${m}:${String(ss).padStart(2,'0')}`;}
+function dKey(d){return`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
+function calcStreak(){if(!sessions.length)return 0;const p=new Set(sessions.map(s=>dKey(new Date(s.date))));let st=0;const d=new Date();if(!p.has(dKey(d)))d.setDate(d.getDate()-1);while(p.has(dKey(d))){st++;d.setDate(d.getDate()-1);}return st;}
+function relDate(d){const diff=Math.floor((new Date()-d)/86400000);if(diff===0)return'Today';if(diff===1)return'Yesterday';return d.toLocaleDateString('en-AU',{day:'numeric',month:'short'});}
+function timeAgo(d){const diff=Math.floor((Date.now()-d)/60000);if(diff<1)return'just now';if(diff<60)return`${diff}m ago`;if(diff<1440)return`${Math.floor(diff/60)}h ago`;return`${Math.floor(diff/1440)}d ago`;}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// Clock
+function tick(){const n=new Date();document.getElementById('clock').textContent=`${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`;}
+tick(); setInterval(tick,30000);
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+document.querySelectorAll('.year-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.year)===selYear));
+refreshNameUI(); renderHomeStats();
+const dp=document.getElementById('progressDots');
+for(let i=0;i<20;i++){const d=document.createElement('div');d.className='pdot'+(i===0?' active':'');dp.appendChild(d);}
+if(!playerName) setTimeout(showNameModal,700);
+</script>
+
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║              FIREBASE SETUP GUIDE — 5 STEPS                     ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║  STEP 1 — Create a Firebase project                             ║
+║  ─────────────────────────────────                              ║
+║  1. Go to https://console.firebase.google.com                   ║
+║  2. Click "Add project"                                         ║
+║  3. Name it "yenda-math" (or anything you like)                 ║
+║  4. Disable Google Analytics (not needed)                       ║
+║  5. Click "Create project"                                      ║
+║                                                                  ║
+║  STEP 2 — Create a Realtime Database                            ║
+║  ────────────────────────────────────                           ║
+║  1. In the left sidebar, click "Build" → "Realtime Database"    ║
+║  2. Click "Create Database"                                     ║
+║  3. Choose a location (e.g. us-central1 or australia-southeast1)║
+║  4. Select "Start in test mode" (allows reads/writes for 30     ║
+║     days — you can tighten rules later)                         ║
+║  5. Click "Enable"                                              ║
+║                                                                  ║
+║  STEP 3 — Get your config and paste it into this file           ║
+║  ─────────────────────────────────────────────────────          ║
+║  1. In Firebase console, click the gear ⚙️ → "Project settings" ║
+║  2. Scroll to "Your apps" → click the </> Web icon              ║
+║  3. Register the app (nickname: "yenda-web")                    ║
+║  4. Copy the firebaseConfig object shown                        ║
+║  5. Open this HTML file, find the firebaseConfig block near     ║
+║     the top (inside the <script type="module">), and replace    ║
+║     the placeholder values with your real ones                  ║
+║                                                                  ║
+║  STEP 4 — Set database security rules                           ║
+║  ────────────────────────────────────                           ║
+║  In Firebase console → Realtime Database → Rules tab,           ║
+║  replace the rules with:                                        ║
+║                                                                  ║
+║  {                                                               ║
+║    "rules": {                                                    ║
+║      "scores": {                                                 ║
+║        ".read": true,                                           ║
+║        ".write": true                                           ║
+║      }                                                          ║
+║    }                                                             ║
+║  }                                                               ║
+║                                                                  ║
+║  (For a kids' app, open read/write is fine. Later you can       ║
+║   add validation rules to prevent cheating or spam.)            ║
+║                                                                  ║
+║  STEP 5 — Test it                                               ║
+║  ─────────────                                                  ║
+║  1. Open the HTML file in a browser (or host it on GitHub       ║
+║     Pages / Netlify — just drag & drop the file)                ║
+║  2. Set a name, complete a quiz                                  ║
+║  3. Check Firebase console → Realtime Database → Data           ║
+║     You should see: scores/year4/<auto-id>/{ ... }              ║
+║  4. Open the Rankings tab — scores should appear!               ║
+║                                                                  ║
+║  OPTIONAL — Host the app for free                               ║
+║  ──────────────────────────────────                             ║
+║  • Netlify: drag the .html file to netlify.com/drop             ║
+║  • GitHub Pages: push to a repo, enable Pages in Settings       ║
+║  • Firebase Hosting: run  firebase deploy  (needs CLI)          ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+</body>
+</html>
