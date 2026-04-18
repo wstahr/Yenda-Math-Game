@@ -16,7 +16,7 @@
 <script type="module">
   import { initializeApp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, push, get, query, orderByChild, limitToFirst }
+  import { getDatabase, ref, push, get, query, orderByChild }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
@@ -35,7 +35,7 @@
     try {
       const app = initializeApp(firebaseConfig);
       const db  = getDatabase(app);
-      window._fb = { db, ref, push, get, query, orderByChild, limitToFirst };
+      window._fb = { db, ref, push, get, query, orderByChild };
       console.log("✅ Firebase connected");
     } catch(e) {
       window._fb = null;
@@ -796,19 +796,19 @@ async function loadRankings(){
   }
   banner.classList.remove('show');
   try{
-    const {db,ref,query,orderByChild,limitToFirst,get}=window._fb;
+    const {db,ref,query,orderByChild,get}=window._fb;
     const yearPath=rankYear===0?'prep':`year${rankYear}`;
-    // limitToFirst(10) on ascending duration index = 10 fastest submissions
-    const snap=await get(query(ref(db,`scores/${yearPath}`),orderByChild('duration'),limitToFirst(10)));
+    // Fetch everything, sort client-side — avoids any Firebase index direction issues
+    const snap=await get(query(ref(db,`scores/${yearPath}`),orderByChild('duration')));
     const lvlLabel=rankYear===0?'Prep':`Year ${rankYear}`;
     if(!snap.exists()){
       list.innerHTML=`<div class="rank-empty"><div class="big" style="font-size:40px;margin-bottom:12px">◎</div><p>No scores yet for ${lvlLabel}.<br>Be the first on the board!</p></div>`;
       return;
     }
-    // Firebase limitToLast returns ascending — reverse to get fastest first
     const all=[];
     snap.forEach(c=>all.push({...c.val()}));
-    const ranked=all.sort((a,b)=>a.duration-b.duration).slice(0,10);
+    // Sort client-side: fastest (lowest duration) first, cap at 50
+    const ranked=all.sort((a,b)=>a.duration-b.duration).slice(0,50);
     buildPodium(ranked.slice(0,3));
     list.innerHTML='';
     ranked.forEach((e,i)=>{
