@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -11,10 +12,11 @@
      STEP 3: Replace firebaseConfig below with your own values
      (see the Firebase Setup Guide further down in this file)
 ═══════════════════════════════════════════════════════════════ -->
+
 <script type="module">
   import { initializeApp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, push, get, query, orderByChild, limitToLast }
+  import { getDatabase, ref, push, get, query, orderByChild, limitToFirst }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
@@ -33,7 +35,7 @@
     try {
       const app = initializeApp(firebaseConfig);
       const db  = getDatabase(app);
-      window._fb = { db, ref, push, get, query, orderByChild, limitToLast };
+      window._fb = { db, ref, push, get, query, orderByChild, limitToFirst };
       console.log("✅ Firebase connected");
     } catch(e) {
       window._fb = null;
@@ -309,6 +311,7 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
   }
 }
 </style>
+
 </head>
 <body>
 
@@ -316,214 +319,216 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
 
   <div id="screens">
 
-    <!-- HOME -->
-    <div id="screen-home" class="screen active">
-      <div class="home-bg hbg1"></div><div class="home-bg hbg2"></div>
-      <div class="home-hero">
-        <div class="home-icon">
-          <!-- Option 3: Infinity brain — two lobes looping endlessly through each other -->
-          <svg width="110" height="88" viewBox="0 0 110 88" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Left lobe back path -->
-            <path d="M55 44 C50 28, 30 18, 20 28 C10 38, 14 56, 24 62 C36 68, 50 58, 55 44"
-              stroke="#8fa07a" stroke-width="7.5" stroke-linecap="round" fill="none"/>
-            <!-- Right lobe back path -->
-            <path d="M55 44 C60 28, 80 18, 90 28 C100 38, 96 56, 86 62 C74 68, 60 58, 55 44"
-              stroke="#6b7c5a" stroke-width="7.5" stroke-linecap="round" fill="none"/>
-            <!-- Crossing point — white knockout -->
-            <path d="M50 44 C52 42, 58 42, 60 44" stroke="#f5f2ed" stroke-width="12" stroke-linecap="round" fill="none"/>
-            <!-- Front strand over the crossing -->
-            <path d="M50 44 C52 46, 58 46, 60 44" stroke="#6b7c5a" stroke-width="7" stroke-linecap="round" fill="none"/>
-            <!-- Left lobe brain folds -->
-            <path d="M16 40 C18 34, 24 34, 24 42" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-            <path d="M14 52 C17 46, 23 47, 22 54" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-            <path d="M24 62 C27 56, 33 57, 32 64" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-            <path d="M36 26 C39 20, 45 21, 45 29" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-            <!-- Right lobe brain folds -->
-            <path d="M94 40 C92 34, 86 34, 86 42" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
-            <path d="M96 52 C93 46, 87 47, 88 54" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
-            <path d="M86 62 C83 56, 77 57, 78 64" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
-            <path d="M74 26 C71 20, 65 21, 65 29" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
-          </svg>
-        </div>
-        <div class="home-name">Quick NAPLAN Maths</div>
-        <div class="player-badge" id="playerBadge" onclick="showNameModal()">
-          <div class="p-avatar p-av" id="homeAvatar">?</div>
-          <span class="p-name-text" id="homeNameText">Set your name</span>
-          <span class="p-edit">✎</span>
-        </div>
-      </div>
-      <div class="year-section">
-        <span class="section-lbl">Select Your Year</span>
-        <div class="year-grid" id="yearGrid">
-          <div class="year-btn active" data-year="0">Prep</div>
-          <div class="year-btn" data-year="1">Year 1</div>
-          <div class="year-btn" data-year="2">Year 2</div>
-          <div class="year-btn" data-year="3">Year 3</div>
-          <div class="year-btn" data-year="4">Year 4</div>
-          <div class="year-btn" data-year="5">Year 5</div>
-          <div class="year-btn" data-year="6">Year 6</div>
-          <div class="year-btn" data-year="7">Year 7</div>
-          <div class="year-btn" data-year="8">Year 8</div>
-          <div class="year-btn" data-year="9">Year 9</div>
-        </div>
-      </div>
-      <div class="home-stats">
-        <span class="section-lbl">Your Progress</span>
-        <div class="stats-row">
-          <div class="stat-card card"><div class="stat-val" id="st-sessions">0</div><div class="stat-lbl">Sessions</div></div>
-          <div class="stat-card card"><div class="stat-val" id="st-pb">—</div><div class="stat-lbl">Best Time</div></div>
-          <div class="stat-card card"><div class="stat-val" id="st-streak">0</div><div class="stat-lbl">Streak</div></div>
-        </div>
-      </div>
-      <div class="cta-wrap">
-        <button class="cta-btn" id="startBtn">Begin Today's Practice →</button>
-      </div>
+```
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="home-bg hbg1"></div><div class="home-bg hbg2"></div>
+  <div class="home-hero">
+    <div class="home-icon">
+      <!-- Option 3: Infinity brain — two lobes looping endlessly through each other -->
+      <svg width="110" height="88" viewBox="0 0 110 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Left lobe back path -->
+        <path d="M55 44 C50 28, 30 18, 20 28 C10 38, 14 56, 24 62 C36 68, 50 58, 55 44"
+          stroke="#8fa07a" stroke-width="7.5" stroke-linecap="round" fill="none"/>
+        <!-- Right lobe back path -->
+        <path d="M55 44 C60 28, 80 18, 90 28 C100 38, 96 56, 86 62 C74 68, 60 58, 55 44"
+          stroke="#6b7c5a" stroke-width="7.5" stroke-linecap="round" fill="none"/>
+        <!-- Crossing point — white knockout -->
+        <path d="M50 44 C52 42, 58 42, 60 44" stroke="#f5f2ed" stroke-width="12" stroke-linecap="round" fill="none"/>
+        <!-- Front strand over the crossing -->
+        <path d="M50 44 C52 46, 58 46, 60 44" stroke="#6b7c5a" stroke-width="7" stroke-linecap="round" fill="none"/>
+        <!-- Left lobe brain folds -->
+        <path d="M16 40 C18 34, 24 34, 24 42" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <path d="M14 52 C17 46, 23 47, 22 54" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <path d="M24 62 C27 56, 33 57, 32 64" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <path d="M36 26 C39 20, 45 21, 45 29" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <!-- Right lobe brain folds -->
+        <path d="M94 40 C92 34, 86 34, 86 42" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
+        <path d="M96 52 C93 46, 87 47, 88 54" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
+        <path d="M86 62 C83 56, 77 57, 78 64" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
+        <path d="M74 26 C71 20, 65 21, 65 29" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
+      </svg>
     </div>
+    <div class="home-name">Quick NAPLAN Maths</div>
+    <div class="player-badge" id="playerBadge" onclick="showNameModal()">
+      <div class="p-avatar p-av" id="homeAvatar">?</div>
+      <span class="p-name-text" id="homeNameText">Set your name</span>
+      <span class="p-edit">✎</span>
+    </div>
+  </div>
+  <div class="year-section">
+    <span class="section-lbl">Select Your Year</span>
+    <div class="year-grid" id="yearGrid">
+      <div class="year-btn active" data-year="0">Prep</div>
+      <div class="year-btn" data-year="1">Year 1</div>
+      <div class="year-btn" data-year="2">Year 2</div>
+      <div class="year-btn" data-year="3">Year 3</div>
+      <div class="year-btn" data-year="4">Year 4</div>
+      <div class="year-btn" data-year="5">Year 5</div>
+      <div class="year-btn" data-year="6">Year 6</div>
+      <div class="year-btn" data-year="7">Year 7</div>
+      <div class="year-btn" data-year="8">Year 8</div>
+      <div class="year-btn" data-year="9">Year 9</div>
+    </div>
+  </div>
+  <div class="home-stats">
+    <span class="section-lbl">Your Progress</span>
+    <div class="stats-row">
+      <div class="stat-card card"><div class="stat-val" id="st-sessions">0</div><div class="stat-lbl">Sessions</div></div>
+      <div class="stat-card card"><div class="stat-val" id="st-pb">—</div><div class="stat-lbl">Best Time</div></div>
+      <div class="stat-card card"><div class="stat-val" id="st-streak">0</div><div class="stat-lbl">Streak</div></div>
+    </div>
+  </div>
+  <div class="cta-wrap">
+    <button class="cta-btn" id="startBtn">Begin Today's Practice →</button>
+  </div>
+</div>
 
-    <!-- QUIZ -->
-    <div id="screen-quiz" class="screen">
-      <div class="quiz-header">
-        <span class="quiz-meta" id="quizMeta">Year 4 · Q 1 of 20</span>
-        <span class="quiz-timer" id="quizTimer">0:00</span>
-      </div>
-      <div class="progress-wrap"><div class="progress-dots" id="progressDots"></div></div>
-      <div class="question-wrap">
-        <div class="question-card card">
-          <span class="q-label">What is the answer?</span>
-          <div class="q-text" id="questionText">7 × 8 = ?</div>
-        </div>
-      </div>
-      <div class="options-wrap" id="optionsWrap"></div>
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <span class="quiz-meta" id="quizMeta">Year 4 · Q 1 of 20</span>
+    <span class="quiz-timer" id="quizTimer">0:00</span>
+  </div>
+  <div class="progress-wrap"><div class="progress-dots" id="progressDots"></div></div>
+  <div class="question-wrap">
+    <div class="question-card card">
+      <span class="q-label">What is the answer?</span>
+      <div class="q-text" id="questionText">7 × 8 = ?</div>
     </div>
+  </div>
+  <div class="options-wrap" id="optionsWrap"></div>
+</div>
 
-    <!-- RESULTS -->
-    <div id="screen-results" class="screen">
-      <div class="results-content">
-        <div class="result-badge" id="resultBadge">⭐</div>
-        <div class="result-title" id="resultTitle">Session Complete</div>
-        <div class="time-display card" style="width:100%">
-          <span class="time-label">Your Time</span>
-          <div class="time-value" id="resultTime">0:00</div>
-          <div class="time-delta" id="resultDelta"></div>
-        </div>
-        <div class="result-stats">
-          <div class="res-stat card"><div class="res-stat-val" id="rs-correct">—</div><div class="res-stat-lbl">Correct</div></div>
-          <div class="res-stat card"><div class="res-stat-val" id="rs-acc">—</div><div class="res-stat-lbl">Accuracy</div></div>
-          <div class="res-stat card"><div class="res-stat-val" id="rs-avg">—</div><div class="res-stat-lbl">Avg / Q</div></div>
-        </div>
-        <div class="upload-status" id="uploadStatus">
-          <div class="upload-icon" id="uploadIcon">⏳</div>
-          <div><div class="upload-text" id="uploadText">Uploading…</div><div class="upload-sub" id="uploadSub"></div></div>
-        </div>
-        <div class="ach-row card" id="achRow" style="display:none">
-          <span class="ach-title">Achievements Unlocked</span>
-          <div class="ach-chips" id="achChips"></div>
-        </div>
-        <div class="result-btns">
-          <button class="res-btn primary" id="playAgainBtn">Play Again</button>
-          <button class="res-btn secondary" id="viewRankBtn">🏆 Rankings</button>
-        </div>
-      </div>
+<!-- RESULTS -->
+<div id="screen-results" class="screen">
+  <div class="results-content">
+    <div class="result-badge" id="resultBadge">⭐</div>
+    <div class="result-title" id="resultTitle">Session Complete</div>
+    <div class="time-display card" style="width:100%">
+      <span class="time-label">Your Time</span>
+      <div class="time-value" id="resultTime">0:00</div>
+      <div class="time-delta" id="resultDelta"></div>
     </div>
+    <div class="result-stats">
+      <div class="res-stat card"><div class="res-stat-val" id="rs-correct">—</div><div class="res-stat-lbl">Correct</div></div>
+      <div class="res-stat card"><div class="res-stat-val" id="rs-acc">—</div><div class="res-stat-lbl">Accuracy</div></div>
+      <div class="res-stat card"><div class="res-stat-val" id="rs-avg">—</div><div class="res-stat-lbl">Avg / Q</div></div>
+    </div>
+    <div class="upload-status" id="uploadStatus">
+      <div class="upload-icon" id="uploadIcon">⏳</div>
+      <div><div class="upload-text" id="uploadText">Uploading…</div><div class="upload-sub" id="uploadSub"></div></div>
+    </div>
+    <div class="ach-row card" id="achRow" style="display:none">
+      <span class="ach-title">Achievements Unlocked</span>
+      <div class="ach-chips" id="achChips"></div>
+    </div>
+    <div class="result-btns">
+      <button class="res-btn primary" id="playAgainBtn">Play Again</button>
+      <button class="res-btn secondary" id="viewRankBtn">🏆 Rankings</button>
+    </div>
+  </div>
+</div>
 
-    <!-- RANKINGS -->
-    <div id="screen-rankings" class="screen">
-      <div class="rank-header">
-        <div>
-          <div class="screen-subtitle" style="margin-bottom:4px">Global</div>
-          <div class="screen-title">Rankings</div>
-        </div>
-        <select class="rank-filter" id="rankFilter">
-          <option value="0">Prep</option>
-          <option value="1">Year 1</option>
-          <option value="2">Year 2</option>
-          <option value="3">Year 3</option>
-          <option value="4" selected>Year 4</option>
-          <option value="5">Year 5</option>
-          <option value="6">Year 6</option>
-          <option value="7">Year 7</option>
-          <option value="8">Year 8</option>
-          <option value="9">Year 9</option>
-        </select>
-      </div>
-      <div class="offline-banner" id="offlineBanner">
-        <span>⚠️</span>
-        <span>Firebase not set up yet. <strong>See setup steps below</strong> to enable global rankings.</span>
-      </div>
-      <div class="podium-wrap"><div class="podium" id="podium"></div></div>
-      <div class="rank-list" id="rankList">
-        <div class="rank-loading"><div class="spin" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px">
-          <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="18" cy="18" r="14" stroke="#ddd8d0" stroke-width="2.5"/>
-            <path d="M18 4 A14 14 0 0 1 32 18" stroke="#6b7c5a" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-        </div><p>Loading rankings…</p></div>
-      </div>
+<!-- RANKINGS -->
+<div id="screen-rankings" class="screen">
+  <div class="rank-header">
+    <div>
+      <div class="screen-subtitle" style="margin-bottom:4px">Global</div>
+      <div class="screen-title">Rankings</div>
     </div>
+    <select class="rank-filter" id="rankFilter">
+      <option value="0">Prep</option>
+      <option value="1">Year 1</option>
+      <option value="2">Year 2</option>
+      <option value="3">Year 3</option>
+      <option value="4" selected>Year 4</option>
+      <option value="5">Year 5</option>
+      <option value="6">Year 6</option>
+      <option value="7">Year 7</option>
+      <option value="8">Year 8</option>
+      <option value="9">Year 9</option>
+    </select>
+  </div>
+  <div class="offline-banner" id="offlineBanner">
+    <span>⚠️</span>
+    <span>Firebase not set up yet. <strong>See setup steps below</strong> to enable global rankings.</span>
+  </div>
+  <div class="podium-wrap"><div class="podium" id="podium"></div></div>
+  <div class="rank-list" id="rankList">
+    <div class="rank-loading"><div class="spin" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="14" stroke="#ddd8d0" stroke-width="2.5"/>
+        <path d="M18 4 A14 14 0 0 1 32 18" stroke="#6b7c5a" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div><p>Loading rankings…</p></div>
+  </div>
+</div>
 
-    <!-- HISTORY -->
-    <div id="screen-history" class="screen">
-      <div class="hist-header">
-        <div>
-          <div class="screen-subtitle" style="margin-bottom:4px">Performance</div>
-          <div class="screen-title">My Times</div>
-        </div>
-        <select class="hist-filter" id="histFilter">
-          <option value="0">Prep</option>
-          <option value="1">Year 1</option>
-          <option value="2">Year 2</option>
-          <option value="3">Year 3</option>
-          <option value="4" selected>Year 4</option>
-          <option value="5">Year 5</option>
-          <option value="6">Year 6</option>
-          <option value="7">Year 7</option>
-          <option value="8">Year 8</option>
-          <option value="9">Year 9</option>
-        </select>
-      </div>
-      <div class="chart-card card">
-        <span class="chart-lbl">Last 7 Sessions — shorter bar = faster time</span>
-        <div class="chart-bars" id="chartBars"></div>
-        <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Personal Best</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--moss)"></div>Most Recent</div>
-        </div>
-      </div>
-      <div class="session-list" id="sessionList"></div>
+<!-- HISTORY -->
+<div id="screen-history" class="screen">
+  <div class="hist-header">
+    <div>
+      <div class="screen-subtitle" style="margin-bottom:4px">Performance</div>
+      <div class="screen-title">My Times</div>
     </div>
+    <select class="hist-filter" id="histFilter">
+      <option value="0">Prep</option>
+      <option value="1">Year 1</option>
+      <option value="2">Year 2</option>
+      <option value="3">Year 3</option>
+      <option value="4" selected>Year 4</option>
+      <option value="5">Year 5</option>
+      <option value="6">Year 6</option>
+      <option value="7">Year 7</option>
+      <option value="8">Year 8</option>
+      <option value="9">Year 9</option>
+    </select>
+  </div>
+  <div class="chart-card card">
+    <span class="chart-lbl">Last 7 Sessions — shorter bar = faster time</span>
+    <div class="chart-bars" id="chartBars"></div>
+    <div class="chart-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Personal Best</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--moss)"></div>Most Recent</div>
+    </div>
+  </div>
+  <div class="session-list" id="sessionList"></div>
+</div>
 
-    <!-- CALENDAR -->
-    <div id="screen-calendar" class="screen">
-      <div class="cal-header">
-        <div class="cal-month" id="calMonth">April 2026</div>
-        <div class="cal-nav">
-          <div class="cal-nav-btn" id="calPrev">‹</div>
-          <div class="cal-nav-btn" id="calNext">›</div>
-        </div>
-      </div>
-      <div class="cal-grid-wrap">
-        <div class="cal-weekdays">
-          <div class="cal-wd">M</div><div class="cal-wd">T</div><div class="cal-wd">W</div>
-          <div class="cal-wd">T</div><div class="cal-wd">F</div><div class="cal-wd">S</div><div class="cal-wd">S</div>
-        </div>
-        <div class="cal-days" id="calDays"></div>
-      </div>
-      <div class="cal-cards">
-        <div class="streak-card card">
-          <div class="streak-icon">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14 3C14 3 18 8 17 12C20 9 20 6 20 6C22 9 23 13 21 17C19.5 20 17 22 14 23C11 22 8.5 20 7 17C5 13 6 9 8 6C8 6 8 9 11 12C10 8 14 3 14 3Z" stroke="#c49a5a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-              <path d="M14 23C12 21 11 19 11.5 17C12 15 14 14 14 14C14 14 16 15 16.5 17C17 19 16 21 14 23Z" stroke="#c49a5a" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-            </svg>
-          </div>
-          <div><div class="streak-num" id="streakNum">0</div><div class="streak-txt">Day Streak</div></div>
-        </div>
-        <div class="last-card card">
-          <div><span class="last-lbl">Last Session</span><div class="last-val" id="lastVal">No sessions yet</div></div>
-          <div class="last-ago" id="lastAgo"></div>
-        </div>
-      </div>
+<!-- CALENDAR -->
+<div id="screen-calendar" class="screen">
+  <div class="cal-header">
+    <div class="cal-month" id="calMonth">April 2026</div>
+    <div class="cal-nav">
+      <div class="cal-nav-btn" id="calPrev">‹</div>
+      <div class="cal-nav-btn" id="calNext">›</div>
     </div>
+  </div>
+  <div class="cal-grid-wrap">
+    <div class="cal-weekdays">
+      <div class="cal-wd">M</div><div class="cal-wd">T</div><div class="cal-wd">W</div>
+      <div class="cal-wd">T</div><div class="cal-wd">F</div><div class="cal-wd">S</div><div class="cal-wd">S</div>
+    </div>
+    <div class="cal-days" id="calDays"></div>
+  </div>
+  <div class="cal-cards">
+    <div class="streak-card card">
+      <div class="streak-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 3C14 3 18 8 17 12C20 9 20 6 20 6C22 9 23 13 21 17C19.5 20 17 22 14 23C11 22 8.5 20 7 17C5 13 6 9 8 6C8 6 8 9 11 12C10 8 14 3 14 3Z" stroke="#c49a5a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M14 23C12 21 11 19 11.5 17C12 15 14 14 14 14C14 14 16 15 16.5 17C17 19 16 21 14 23Z" stroke="#c49a5a" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div><div class="streak-num" id="streakNum">0</div><div class="streak-txt">Day Streak</div></div>
+    </div>
+    <div class="last-card card">
+      <div><span class="last-lbl">Last Session</span><div class="last-val" id="lastVal">No sessions yet</div></div>
+      <div class="last-ago" id="lastAgo"></div>
+    </div>
+  </div>
+</div>
+```
 
   </div><!-- /screens -->
 
@@ -591,6 +596,7 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
   </div>
 
   <!-- NAME MODAL -->
+
   <div id="name-modal">
     <div class="modal-card">
       <div class="modal-icon">
@@ -790,10 +796,10 @@ async function loadRankings(){
   }
   banner.classList.remove('show');
   try{
-    const {db,ref,query,orderByChild,limitToLast,get}=window._fb;
+    const {db,ref,query,orderByChild,limitToFirst,get}=window._fb;
     const yearPath=rankYear===0?'prep':`year${rankYear}`;
-    // Fetch the 10 fastest submissions — no deduplication, every entry counts
-    const snap=await get(query(ref(db,`scores/${yearPath}`),orderByChild('duration'),limitToLast(10)));
+    // limitToFirst(10) on ascending duration index = 10 fastest submissions
+    const snap=await get(query(ref(db,`scores/${yearPath}`),orderByChild('duration'),limitToFirst(10)));
     const lvlLabel=rankYear===0?'Prep':`Year ${rankYear}`;
     if(!snap.exists()){
       list.innerHTML=`<div class="rank-empty"><div class="big" style="font-size:40px;margin-bottom:12px">◎</div><p>No scores yet for ${lvlLabel}.<br>Be the first on the board!</p></div>`;
@@ -1267,5 +1273,6 @@ if(!playerName) setTimeout(showNameModal,700);
 ║                                                                  ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
+
 </body>
 </html>
