@@ -114,8 +114,8 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
 .p-name-text{font-size:13px;font-weight:500;color:var(--charcoal)}
 .p-edit{font-size:10px;color:var(--ash);margin-left:4px}
 .year-section{padding:0 24px 12px;position:relative;z-index:1}
-.year-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.year-btn{padding:11px 8px;border:1.5px solid var(--fog);border-radius:14px;background:var(--white);font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;color:var(--slate);text-align:center;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.year-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.year-btn{padding:10px 4px;border:1.5px solid var(--fog);border-radius:12px;background:var(--white);font-family:'Zen Kaku Gothic New',sans-serif;font-size:11px;color:var(--slate);text-align:center;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
 .year-btn:active{transform:scale(.96)}
 .year-btn.active{background:var(--moss);border-color:var(--moss);color:var(--white);font-weight:500;box-shadow:0 4px 12px rgba(107,124,90,.3)}
 .home-stats{padding:0 24px 12px;position:relative;z-index:1}
@@ -233,8 +233,8 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
 /* ══════════════ HISTORY ══════════════ */
 #screen-history{background:#f4f6f2}
 .hist-header{padding:20px 24px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.hist-filter{font-size:12px;color:var(--moss);font-weight:500;cursor:pointer;padding:6px 14px;border:1.5px solid var(--moss);border-radius:20px;transition:all .2s;-webkit-tap-highlight-color:transparent}
-.hist-filter:active{background:var(--moss);color:white}
+.hist-filter{font-size:12px;color:var(--moss);font-weight:500;cursor:pointer;padding:6px 32px 6px 14px;border:1.5px solid var(--moss);border-radius:20px;transition:all .2s;-webkit-tap-highlight-color:transparent;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7c5a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center;-webkit-appearance:none;appearance:none;outline:none;font-family:'Zen Kaku Gothic New',sans-serif}
+.hist-filter:focus{box-shadow:0 0 0 3px rgba(107,124,90,.15)}
 .chart-card{margin:0 24px 16px;padding:16px}
 .chart-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--ash);margin-bottom:12px;display:block}
 .chart-bars{display:flex;align-items:flex-end;gap:6px;height:80px}
@@ -330,12 +330,16 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
       <div class="year-section">
         <span class="section-lbl">Select Your Year</span>
         <div class="year-grid" id="yearGrid">
+          <div class="year-btn active" data-year="0">Prep</div>
           <div class="year-btn" data-year="1">Year 1</div>
           <div class="year-btn" data-year="2">Year 2</div>
           <div class="year-btn" data-year="3">Year 3</div>
-          <div class="year-btn active" data-year="4">Year 4</div>
+          <div class="year-btn" data-year="4">Year 4</div>
           <div class="year-btn" data-year="5">Year 5</div>
           <div class="year-btn" data-year="6">Year 6</div>
+          <div class="year-btn" data-year="7">Year 7</div>
+          <div class="year-btn" data-year="8">Year 8</div>
+          <div class="year-btn" data-year="9">Year 9</div>
         </div>
       </div>
       <div class="home-stats">
@@ -405,12 +409,16 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
           <div class="screen-title">Rankings</div>
         </div>
         <select class="rank-filter" id="rankFilter">
+          <option value="0">Prep</option>
           <option value="1">Year 1</option>
           <option value="2">Year 2</option>
           <option value="3">Year 3</option>
           <option value="4" selected>Year 4</option>
           <option value="5">Year 5</option>
           <option value="6">Year 6</option>
+          <option value="7">Year 7</option>
+          <option value="8">Year 8</option>
+          <option value="9">Year 9</option>
         </select>
       </div>
       <div class="offline-banner" id="offlineBanner">
@@ -430,7 +438,18 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
           <div class="screen-subtitle" style="margin-bottom:4px">Performance</div>
           <div class="screen-title">My Times</div>
         </div>
-        <div class="hist-filter" id="histFilter">Year 4 ▾</div>
+        <select class="hist-filter" id="histFilter">
+          <option value="0">Prep</option>
+          <option value="1">Year 1</option>
+          <option value="2">Year 2</option>
+          <option value="3">Year 3</option>
+          <option value="4" selected>Year 4</option>
+          <option value="5">Year 5</option>
+          <option value="6">Year 6</option>
+          <option value="7">Year 7</option>
+          <option value="8">Year 8</option>
+          <option value="9">Year 9</option>
+        </select>
       </div>
       <div class="chart-card card">
         <span class="chart-lbl">Last 7 Sessions — shorter bar = faster time</span>
@@ -507,7 +526,7 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
 ══════════════════════════════════════════════ */
 let playerName   = localStorage.getItem('ym_name') || '';
 let playerId     = localStorage.getItem('ym_pid')  || mkId();
-let selYear      = parseInt(localStorage.getItem('ym_year') || '4');
+let selYear      = parseInt(localStorage.getItem('ym_year') ?? '0');
 let sessions     = JSON.parse(localStorage.getItem('ym_sessions') || '[]');
 let achievements = JSON.parse(localStorage.getItem('ym_ach') || '[]');
 let calDate      = new Date();
@@ -629,7 +648,8 @@ async function uploadScore(session){
   }
   try{
     const {db,ref,push} = window._fb;
-    await push(ref(db,`scores/year${session.year}`),{
+    const yearPath=session.year===0?'prep':`year${session.year}`;
+    await push(ref(db,`scores/${yearPath}`),{
       playerId, playerName: playerName||'Anonymous',
       year:session.year, correct:session.correct, total:session.total,
       duration:Math.round(session.duration*10)/10,
@@ -668,7 +688,8 @@ async function loadRankings(){
   banner.classList.remove('show');
   try{
     const {db,ref,query,orderByChild,limitToLast,get}=window._fb;
-    const snap=await get(query(ref(db,`scores/year${rankYear}`),orderByChild('duration'),limitToLast(200)));
+    const yearPath=rankYear===0?'prep':`year${rankYear}`;
+    const snap=await get(query(ref(db,`scores/${yearPath}`),orderByChild('duration'),limitToLast(200)));
     if(!snap.exists()){
       list.innerHTML=`<div class="rank-empty"><div class="big">🌿</div><p>No scores yet for Year ${rankYear}.<br>Be the first on the board!</p></div>`;
       return;
@@ -683,7 +704,8 @@ async function loadRankings(){
       const me=e.playerId===playerId;
       const row=document.createElement('div');
       row.className='rank-row card'+(me?' me':'');
-      row.innerHTML=`<div class="rank-left"><div class="rk-num">${i+1}</div><div class="rk-av" style="background:${avColor(e.playerName)}">${(e.playerName||'?').charAt(0).toUpperCase()}</div><div class="rk-info"><div class="rk-player">${esc(e.playerName||'Anonymous')}${me?' 👈':''}</div><div class="rk-meta">Year ${e.year} · ${e.accuracy}% · ${new Date(e.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</div></div></div><div class="rk-right"><div class="rk-time">${fmt(e.duration)}</div>${i===0?'<div class="rk-crown">👑</div>':''}</div>`;
+      const eLbl=e.year===0?'Prep':`Year ${e.year}`;
+      row.innerHTML=`<div class="rank-left"><div class="rk-num">${i+1}</div><div class="rk-av" style="background:${avColor(e.playerName)}">${(e.playerName||'?').charAt(0).toUpperCase()}</div><div class="rk-info"><div class="rk-player">${esc(e.playerName||'Anonymous')}${me?' 👈':''}</div><div class="rk-meta">${eLbl} · ${e.accuracy}% · ${new Date(e.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</div></div></div><div class="rk-right"><div class="rk-time">${fmt(e.duration)}</div>${i===0?'<div class="rk-crown">👑</div>':''}</div>`;
       list.appendChild(row);
     });
   }catch(err){
@@ -719,7 +741,7 @@ function navigate(id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.screen===id));
   const sc=document.getElementById('screen-'+id);
   if(sc){sc.classList.add('active');sc.scrollTop=0;}
-  if(id==='history')  renderHistory();
+  if(id==='history'){histYear=selYear;document.getElementById('histFilter').value=histYear;renderHistory();}
   if(id==='calendar') renderCalendar();
   if(id==='home')     renderHomeStats();
   if(id==='rankings'){rankYear=selYear;document.getElementById('rankFilter').value=rankYear;loadRankings();}
@@ -766,7 +788,8 @@ function renderDots(){
 }
 function renderQ(){
   const q=qList[qIdx];
-  document.getElementById('quizMeta').textContent=`Year ${selYear} · Q ${qIdx+1} of 20`;
+  const levelLabel=selYear===0?'Prep':`Year ${selYear}`;
+  document.getElementById('quizMeta').textContent=`${levelLabel} · Q ${qIdx+1} of 20`;
   document.getElementById('questionText').textContent=q.question;
   const w=document.getElementById('optionsWrap'); w.innerHTML=''; qAnswered=false;
   q.options.forEach(o=>{
@@ -828,7 +851,8 @@ function checkAch(s,all){
   ck('perf'+s.year+s.correct,'✨ Perfect Score','gold',s.correct===20);
   const st=calcStreak();
   ck('s3','🔥 3-Day Streak','green',st>=3); ck('s7','🔥 7-Day Streak','gold',st>=7);
-  ck('y'+s.year,`📖 Year ${s.year} Started`,'green',ys.length===1);
+  const lvlName=s.year===0?'Prep':`Year ${s.year}`;
+  ck('y'+s.year,`📖 ${lvlName} Started`,'green',ys.length===1);
   ck('c100','💯 Century','gold',all.length>=100);
   ck('eb','🌅 Early Bird','green',new Date(s.date).getHours()<8);
   ck('acc90','🎯 Sharp Solver','green',s.correct>=18);
@@ -840,7 +864,8 @@ function checkAch(s,all){
 ══════════════════════════════════════════════ */
 function renderHistory(){
   const f=sessions.filter(s=>s.year===histYear);
-  document.getElementById('histFilter').textContent=`Year ${histYear} ▾`;
+  document.getElementById('histFilter').value=histYear;
+  const levelName=histYear===0?'Prep':`Year ${histYear}`;
   const cb=document.getElementById('chartBars'); cb.innerHTML='';
   const cd=f.slice(0,7).reverse();
   const pbD=f.length?Math.min(...f.map(s=>s.duration)):null;
@@ -857,14 +882,15 @@ function renderHistory(){
     });
   } else cb.innerHTML='<div style="color:var(--ash);font-size:12px;padding:20px;text-align:center">No sessions yet</div>';
   const sl=document.getElementById('sessionList'); sl.innerHTML='';
-  if(!f.length){sl.innerHTML=`<div class="no-sessions"><div class="big">📖</div>No Year ${histYear} sessions yet.</div>`;return;}
+  if(!f.length){sl.innerHTML=`<div class="no-sessions"><div class="big">📖</div>No ${levelName} sessions yet.</div>`;return;}
   f.slice(0,20).forEach(s=>{
+    const lbl=s.year===0?'Prep':`Year ${s.year}`;
     const row=document.createElement('div'); row.className='session-row card';
-    row.innerHTML=`<div class="sess-l"><div class="sess-date">${relDate(new Date(s.date))}</div><div class="sess-meta">Year ${s.year} · ${s.correct}/20 correct</div></div><div class="sess-r"><div class="sess-time">${fmt(s.duration)}</div>${s.isPB?'<div class="sess-pb">PB</div>':''}</div>`;
+    row.innerHTML=`<div class="sess-l"><div class="sess-date">${relDate(new Date(s.date))}</div><div class="sess-meta">${lbl} · ${s.correct}/20 correct</div></div><div class="sess-r"><div class="sess-time">${fmt(s.duration)}</div>${s.isPB?'<div class="sess-pb">PB</div>':''}</div>`;
     sl.appendChild(row);
   });
 }
-document.getElementById('histFilter').addEventListener('click',()=>{ histYear=histYear>=6?1:histYear+1; renderHistory(); });
+document.getElementById('histFilter').addEventListener('change', e=>{ histYear=parseInt(e.target.value); renderHistory(); });
 
 /* ══════════════════════════════════════════════
    CALENDAR
@@ -888,7 +914,8 @@ function renderCalendar(){
   document.getElementById('streakNum').textContent=calcStreak();
   if(sessions.length){
     const last=sessions[0],d=new Date(last.date);
-    document.getElementById('lastVal').textContent=`${relDate(d)} · ${fmt(last.duration)} · Year ${last.year}`;
+    const lastLbl=last.year===0?'Prep':`Year ${last.year}`;
+    document.getElementById('lastVal').textContent=`${relDate(d)} · ${fmt(last.duration)} · ${lastLbl}`;
     document.getElementById('lastAgo').textContent=timeAgo(d);
   } else { document.getElementById('lastVal').textContent='No sessions yet'; document.getElementById('lastAgo').textContent=''; }
 }
@@ -910,39 +937,113 @@ document.getElementById('rankFilter').addEventListener('change', e=>{ rankYear=p
    QUESTION BANK
 ══════════════════════════════════════════════ */
 function genQs(yr,n=20){const qs=[],g=getGens(yr);for(let i=0;i<n;i++)qs.push(g[Math.floor(Math.random()*g.length)]());return qs;}
-function mkQ(q,correct,topic,dist){const opts=[correct,...dist.slice(0,3)];for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}return{question:q,correct:String(correct),options:opts.map(String),topic};}
+function mkQ(q,correct,topic,dist){
+  const c=String(correct);
+  const opts=[c];
+  for(const d of dist){
+    const s=String(d);
+    if(s!==c&&!opts.includes(s)) opts.push(s);
+    if(opts.length===4) break;
+  }
+  let pad=1;
+  while(opts.length<4){const s=String(Number(correct)+pad);if(!opts.includes(s))opts.push(s);pad++;}
+  for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}
+  return{question:q,correct:c,options:opts,topic};
+}
 function getGens(yr){
   const r=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
-  if(yr<=2)return[
-    ()=>{const a=r(1,10),b=r(1,10);return mkQ(`${a} + ${b} = ?`,a+b,'Add',[a+b-1,a+b+1,a+b+2]);},
-    ()=>{const a=r(5,15),b=r(1,a);return mkQ(`${a} − ${b} = ?`,a-b,'Sub',[a-b-1,a-b+1,a-b+2]);},
-    ()=>{const a=r(1,10);return mkQ(`${a} + ${a} = ?`,a*2,'Doubles',[a*2-1,a*2+1,a*2+2]);},
-    ()=>{const a=r(10,20),b=r(1,9);return mkQ(`${a} + ${b} = ?`,a+b,'Add',[a+b-1,a+b+1,a+b-2]);},
+
+  // PREP — counting, tiny sums, what comes next
+  if(yr===0) return[
+    ()=>{const a=r(1,5),b=r(1,4);return mkQ(`${a} + ${b} = ?`,a+b,'Counting',[a+b+1,a+b+2,Math.max(1,a+b-1)]);},
+    ()=>{const a=r(3,8),b=r(1,a-1);return mkQ(`${a} − ${b} = ?`,a-b,'Sub',[a-b+1,a-b+2,Math.max(1,a-b-1)]);},
+    ()=>{const a=r(1,9);return mkQ(`What comes after ${a}?`,a+1,'Count',[a+2,a,a+3]);},
+    ()=>{const a=r(2,10);return mkQ(`What comes before ${a}?`,a-1,'Count',[a,a+1,Math.max(1,a-2)]);},
+    ()=>{const a=r(1,5);return mkQ(`${a} + 1 = ?`,a+1,'Add1',[a+2,a,a+3]);},
+    ()=>{const a=r(1,4);return mkQ(`${a} + 2 = ?`,a+2,'Add2',[a+1,a+3,a]);},
+    ()=>{const n=r(1,5)*2;return mkQ(`Half of ${n} = ?`,n/2,'Halves',[n/2+1,Math.max(1,n/2-1),n]);},
+    ()=>{const a=r(2,5);return mkQ(`${a} × 2 = ?`,a*2,'Groups',[a*2+1,a*2+2,Math.max(1,a*2-1)]);},
   ];
-  if(yr===3)return[
-    ()=>{const b=[2,5,10][r(0,2)],a=r(1,12);return mkQ(`${a} × ${b} = ?`,a*b,'Tables',[a*b-b,a*b+b,a*b+2*b]);},
-    ()=>{const a=r(100,999),b=r(10,99);return mkQ(`${a} + ${b} = ?`,a+b,'Place',[a+b-1,a+b+1,a+b-10]);},
-    ()=>{const a=r(50,200),b=r(10,a);return mkQ(`${a} − ${b} = ?`,a-b,'Sub',[a-b-1,a-b+1,a-b+10]);},
-    ()=>{const n=r(2,20)*2;return mkQ(`½ of ${n} = ?`,n/2,'Fractions',[n/2-1,n/2+1,n/2+2]);},
+
+  // YEAR 1–2
+  if(yr<=2) return[
+    ()=>{const a=r(1,10),b=r(1,10);return mkQ(`${a} + ${b} = ?`,a+b,'Add',[a+b+1,Math.max(1,a+b-1),a+b+2]);},
+    ()=>{const a=r(5,18),b=r(1,a);return mkQ(`${a} − ${b} = ?`,a-b,'Sub',[a-b+1,Math.max(0,a-b-1),a-b+2]);},
+    ()=>{const a=r(1,10);return mkQ(`${a} + ${a} = ?`,a*2,'Doubles',[a*2+1,Math.max(1,a*2-1),a*2+2]);},
+    ()=>{const a=r(10,20),b=r(1,9);return mkQ(`${a} + ${b} = ?`,a+b,'Add',[a+b+1,a+b-1,a+b+2]);},
+    ()=>{const n=r(2,10)*2;return mkQ(`Half of ${n} = ?`,n/2,'Halves',[n/2+1,n/2+2,Math.max(1,n/2-1)]);},
+    ()=>{const a=r(1,5);return mkQ(`${a} × 2 = ?`,a*2,'Groups',[a*2+1,Math.max(1,a*2-1),a*2+2]);},
   ];
-  if(yr===4)return[
-    ()=>{const a=r(2,12),b=r(2,12);return mkQ(`${a} × ${b} = ?`,a*b,'Tables',[a*b-a,a*b+a,a*b+b]);},
-    ()=>{const b=r(2,9),a=b*r(2,12);return mkQ(`${a} ÷ ${b} = ?`,a/b,'Div',[a/b-1,a/b+1,a/b+2]);},
-    ()=>{const l=r(3,12),w=r(2,8);return mkQ(`Area: ${l} × ${w} = ?`,l*w,'Area',[l*w-l,l*w+w,l*w-w]);},
-    ()=>{const l=r(3,12),w=r(2,8);return mkQ(`Perimeter: 2×(${l}+${w}) = ?`,2*(l+w),'Perim',[2*(l+w)-2,2*(l+w)+2,l+w]);},
-    ()=>{const a=r(100,999),b=r(100,999);return mkQ(`${a} + ${b} = ?`,a+b,'Add',[a+b-1,a+b+1,a+b-10]);},
+
+  // YEAR 3
+  if(yr===3) return[
+    ()=>{const b=[2,5,10][r(0,2)],a=r(1,12);return mkQ(`${a} × ${b} = ?`,a*b,'Tables',[a*b+b,Math.max(1,a*b-b),a*b+2*b]);},
+    ()=>{const a=r(100,999),b=r(10,99);return mkQ(`${a} + ${b} = ?`,a+b,'Place',[a+b+1,a+b-1,a+b+10]);},
+    ()=>{const a=r(50,200),b=r(10,a);return mkQ(`${a} − ${b} = ?`,a-b,'Sub',[a-b+1,Math.max(0,a-b-1),a-b+10]);},
+    ()=>{const n=r(2,20)*2;return mkQ(`½ of ${n} = ?`,n/2,'Fractions',[n/2+1,Math.max(1,n/2-1),n/2+2]);},
+    ()=>{const n=r(1,12)*4;return mkQ(`¼ of ${n} = ?`,n/4,'Fractions',[n/4+1,Math.max(1,n/4-1),n/2]);},
+    ()=>{const a=r(2,9),b=r(2,9);return mkQ(`${a} × ${b} = ?`,a*b,'Tables',[a*b+a,Math.max(1,a*b-a),a*b+b]);},
   ];
-  if(yr===5)return[
-    ()=>{const a=r(11,50),b=r(11,50);return mkQ(`${a} × ${b} = ?`,a*b,'Mult',[a*b-a,a*b+b,a*b-b]);},
-    ()=>{const p=[10,20,25,50][r(0,3)],a=r(2,20)*10;return mkQ(`${p}% of ${a} = ?`,p*a/100,'Pct',[p*a/100-5,p*a/100+5,p*a/100+10]);},
-    ()=>{const a=r(2,8),b=r(2,8),c=r(2,5);return mkQ(`${a} + ${b} × ${c} = ?`,a+b*c,'BODMAS',[a+b*c-1,(a+b)*c,a+b*c+c]);},
-    ()=>{const a=r(1,9);return mkQ(`${a}² = ?`,a*a,'Powers',[a*a-a,a*a+a,(a+1)*(a+1)]);},
+
+  // YEAR 4
+  if(yr===4) return[
+    ()=>{const a=r(2,12),b=r(2,12);return mkQ(`${a} × ${b} = ?`,a*b,'Tables',[a*b+a,Math.max(1,a*b-a),a*b+b]);},
+    ()=>{const b=r(2,9),a=b*r(2,12);return mkQ(`${a} ÷ ${b} = ?`,a/b,'Div',[a/b+1,Math.max(1,a/b-1),a/b+2]);},
+    ()=>{const l=r(3,12),w=r(2,8);return mkQ(`Area: ${l} × ${w} = ?`,l*w,'Area',[l*w+l,Math.max(1,l*w-l),l*w+w]);},
+    ()=>{const l=r(3,12),w=r(2,8);return mkQ(`Perimeter: 2×(${l}+${w}) = ?`,2*(l+w),'Perim',[2*(l+w)+2,2*(l+w)-2,l+w]);},
+    ()=>{const a=r(100,999),b=r(100,999);return mkQ(`${a} + ${b} = ?`,a+b,'Add',[a+b+1,a+b-1,a+b+10]);},
+    ()=>{const a=r(200,999),b=r(100,a-100);return mkQ(`${a} − ${b} = ?`,a-b,'Sub',[a-b+1,Math.max(1,a-b-1),a-b+10]);},
   ];
+
+  // YEAR 5
+  if(yr===5) return[
+    ()=>{const a=r(11,50),b=r(11,50);return mkQ(`${a} × ${b} = ?`,a*b,'Mult',[a*b+a,Math.max(1,a*b-a),a*b+b]);},
+    ()=>{const p=[10,20,25,50][r(0,3)],a=r(2,20)*10;return mkQ(`${p}% of ${a} = ?`,p*a/100,'Pct',[p*a/100+5,Math.max(1,p*a/100-5),p*a/100+10]);},
+    ()=>{const a=r(2,8),b=r(2,8),c=r(2,5);return mkQ(`${a} + ${b} × ${c} = ?`,a+b*c,'BODMAS',[Math.max(1,a+b*c-1),(a+b)*c,a+b*c+c]);},
+    ()=>{const a=r(2,9);return mkQ(`${a}² = ?`,a*a,'Powers',[Math.max(1,a*a-a),a*a+a,(a+1)*(a+1)]);},
+    ()=>{const b=r(2,12),a=b*r(2,10);return mkQ(`${a} ÷ ${b} = ?`,a/b,'Div',[a/b+1,Math.max(1,a/b-1),a/b+2]);},
+  ];
+
+  // YEAR 6
+  if(yr===6) return[
+    ()=>{const x=r(2,8),b=r(1,15),tot=x*r(2,6)+b;return mkQ(`If 3x + ${b} = ${tot}, x = ?`,(tot-b)/3,'Algebra',[(tot-b)/3+1,Math.max(1,(tot-b)/3-1),(tot-b)/3+2]);},
+    ()=>{const ns=[r(2,15),r(2,15),r(2,15),r(2,15),r(2,15)];const mn=Math.round(ns.reduce((a,b)=>a+b,0)/5);return mkQ(`Mean of ${ns.join(', ')} = ?`,mn,'Stats',[mn+1,Math.max(1,mn-1),ns[0]]);},
+    ()=>{const p=r(2,9)*10,a=r(100,500);return mkQ(`${p}% of ${a} = ?`,p*a/100,'Pct',[p*a/100+10,Math.max(1,p*a/100-10),p*a/200]);},
+    ()=>{const a=r(2,8),b=r(2,6);return mkQ(`${a}(${b} + 3) = ?`,a*(b+3),'Algebra',[a*b+3,a*(b+3)+a,Math.max(1,a*(b+3)-1)]);},
+    ()=>{const l=r(2,10),w=r(2,8),h=r(2,6);return mkQ(`Volume: ${l}×${w}×${h} = ?`,l*w*h,'Volume',[l*w*h+l*w,Math.max(1,l*w*h-l*w),l*w*h+w*h]);},
+  ];
+
+  // YEAR 7
+  if(yr===7) return[
+    ()=>{const a=r(2,12),b=r(2,12),c=r(1,20);return mkQ(`${a}x + ${c} = ${a*b+c}, x = ?`,b,'Algebra',[b+1,Math.max(1,b-1),b+2]);},
+    ()=>{const p=[5,10,15,20,25][r(0,4)],a=r(50,400);const ans=Math.round(a*(1+p/100));return mkQ(`${a} increased by ${p}% = ?`,ans,'Percent',[ans+p,Math.max(1,ans-p),a+p]);},
+    ()=>{const a=r(2,10),b=r(2,10);return mkQ(`${a}² + ${b}² = ?`,a*a+b*b,'Powers',[a*a+b*b+a,Math.max(1,a*a+b*b-b),(a+b)*(a+b)]);},
+    ()=>{const base=r(2,10),h=r(2,10);return mkQ(`Area of triangle: ½×${base}×${h} = ?`,base*h/2,'Geometry',[base*h/2+1,Math.max(1,base*h/2-1),base*h]);},
+    ()=>{const a=r(1,8),b=r(1,8);return mkQ(`${-a} + ${-b} = ?`,-(a+b),'Integers',[-(a+b)+1,-(a+b)-1,-(a+b)+2]);},
+    ()=>{const a=r(2,9),b=r(2,9);return mkQ(`${a}² − ${b}² = ?`,a*a-b*b,'Algebra',[a*a-b*b+a,Math.max(0,a*a-b*b-b),a*a-b*b+b]);},
+    ()=>{const base=r(3,12),h=r(3,10);return mkQ(`Parallelogram area: ${base}×${h} = ?`,base*h,'Geometry',[base*h+base,Math.max(1,base*h-h),base+h]);},
+  ];
+
+  // YEAR 8
+  if(yr===8) return[
+    ()=>{const m=r(2,8),c=r(1,10),x=r(2,8);return mkQ(`y = ${m}x + ${c}, when x = ${x}, y = ?`,m*x+c,'Linear',[m*x+c+m,Math.max(0,m*x+c-m),m*x+c+1]);},
+    ()=>{const p=[5,10,15,20,25][r(0,4)],a=r(200,800);const disc=Math.round(a*(1-p/100));return mkQ(`${a} discounted ${p}% = ?`,disc,'Percent',[disc+p,Math.max(0,disc-p),a-p]);},
+    ()=>{const rv=r(2,8);return mkQ(`Area of circle r=${rv}: π×${rv}² ≈ ?`,Math.round(Math.PI*rv*rv),'Geometry',[Math.round(Math.PI*rv*rv)+rv,Math.max(1,Math.round(Math.PI*rv*rv)-rv),2*Math.round(Math.PI*rv)]);},
+    ()=>{const a=r(1,6),b=r(1,6),c=r(1,6);return mkQ(`Mean of ${a}, ${b}, ${c} ≈ ?`,Math.round((a+b+c)/3*10)/10,'Stats',[Math.round((a+b+c)/3*10)/10+1,Math.max(0,Math.round((a+b+c)/3*10)/10-1),a+b+c]);},
+    ()=>{const a=r(2,9),c=r(2,9);return mkQ(`${a}x = ${a*c}, x = ?`,c,'Algebra',[c+1,Math.max(1,c-1),c+2]);},
+    ()=>{const a=r(2,9),b=r(1,5);return mkQ(`${a}${b<0?b:'+'+b} simplifies — value when a=${r(1,5)}: ?`,a*2+b,'Algebra',[a*2+b+1,Math.max(0,a*2+b-1),a*2+b+2]);},
+    ()=>{const x=r(2,6),y=r(2,6);return mkQ(`Gradient between (0,0) and (${x},${y}): y/x = ?`,Math.round(y/x*10)/10,'Linear',[Math.round(y/x*10)/10+1,Math.max(0,Math.round(y/x*10)/10-0.5),x/y>0?Math.round(x/y*10)/10:1]);},
+  ];
+
+  // YEAR 9
   return[
-    ()=>{const x=r(2,8),b=r(1,15),tot=x*r(2,6)+b;return mkQ(`If 3x + ${b} = ${tot}, x = ?`,(tot-b)/3,'Algebra',[(tot-b)/3+1,(tot-b)/3-1,(tot-b)/3+2]);},
-    ()=>{const ns=[r(2,15),r(2,15),r(2,15),r(2,15),r(2,15)];const mn=Math.round(ns.reduce((a,b)=>a+b,0)/5);return mkQ(`Mean of ${ns.join(', ')} = ?`,mn,'Stats',[mn+1,mn-1,ns[0]]);},
-    ()=>{const p=r(2,9)*10,a=r(100,1000);return mkQ(`${p}% of ${a} = ?`,p*a/100,'Pct',[p*a/100+10,p*a/100-10,p*a/200]);},
-    ()=>{const a=r(2,8),b=r(2,6);return mkQ(`${a}(${b} + 3) = ?`,a*(b+3),'Algebra',[a*b+3,a*(b+3)+a,a*(b+3)-1]);},
+    ()=>{const a=r(2,8),b=r(2,8);const sum=-(a+b),prod=a*b;return mkQ(`x² ${sum<0?sum:'+'+sum}x + ${prod} = 0, one solution x = ?`,a,'Quadratic',[Math.max(1,a-1),a+1,b+1]);},
+    ()=>{const m=r(2,8),c=r(1,10),x=r(2,8);return mkQ(`${m}x − ${c} = ${m*x-c}, x = ?`,x,'Linear',[x+1,Math.max(1,x-1),x+2]);},
+    ()=>{const a=r(3,10),b=r(3,8);const hyp=Math.round(Math.sqrt(a*a+b*b)*10)/10;return mkQ(`Hypotenuse of ${a}, ${b} right triangle ≈ ?`,hyp,'Pythagoras',[hyp+1,Math.max(1,hyp-1),a+b]);},
+    ()=>{const p=r(2,9)*5,orig=r(100,600);const ans=Math.round(orig*(1+p/100));return mkQ(`${orig} + ${p}% = ?`,ans,'Percent',[ans+p,Math.max(0,ans-p),orig+p]);},
+    ()=>{const base=r(2,8),exp=r(2,3);return mkQ(`${base}${exp===2?'²':'³'} = ?`,Math.pow(base,exp),'Powers',[Math.pow(base,exp)+base,Math.max(1,Math.pow(base,exp)-base),Math.pow(base+1,exp)]);},
+    ()=>{const a=r(1,9),b=r(1,9);return mkQ(`√${a*a} + √${b*b} = ?`,a+b,'Surds',[a+b+1,Math.max(1,a+b-1),a*b]);},
+    ()=>{const a=r(2,9),c=r(1,8),x=r(2,6);return mkQ(`${a}x² when x = ${x} ≈ ?`,a*x*x,'Quadratic',[a*x*x+a,Math.max(1,a*x*x-a),(a+1)*x*x]);},
   ];
 }
 
@@ -960,6 +1061,8 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
    INIT
 ══════════════════════════════════════════════ */
 document.querySelectorAll('.year-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.year)===selYear));
+document.getElementById('histFilter').value=selYear;
+document.getElementById('rankFilter').value=selYear;
 refreshNameUI(); renderHomeStats();
 const dp=document.getElementById('progressDots');
 for(let i=0;i<20;i++){const d=document.createElement('div');d.className='pdot'+(i===0?' active':'');dp.appendChild(d);}
@@ -1006,8 +1109,16 @@ if(!playerName) setTimeout(showNameModal,700);
 ║  {                                                               ║
 ║    "rules": {                                                    ║
 ║      "scores": {                                                 ║
-║        ".read": true,                                           ║
-║        ".write": true                                           ║
+║        "prep":  { ".read":true,".write":true,".indexOn":["duration"] }, ║
+║        "year1": { ".read":true,".write":true,".indexOn":["duration"] }, ║
+║        "year2": { ".read":true,".write":true,".indexOn":["duration"] }, ║
+║        "year3": { ".read":true,".write":true,".indexOn":["duration"] }, ║
+║        "year4": { ".read":true,".write":true,".indexOn":["duration"] }, ║
+║        "year5": { ".read":true,".write":true,".indexOn":["duration"] }, ║
+║        "year6": { ".read":true,".write":true,".indexOn":["duration"] }, ║
+║        "year7": { ".read":true,".write":true,".indexOn":["duration"] }, ║
+║        "year8": { ".read":true,".write":true,".indexOn":["duration"] }, ║
+║        "year9": { ".read":true,".write":true,".indexOn":["duration"] }  ║
 ║      }                                                          ║
 ║    }                                                             ║
 ║  }                                                               ║
