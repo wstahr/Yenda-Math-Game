@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Yenda Math · 算数の練習</title>
+<title>Quick NAPLAN Maths</title>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -11,6 +12,7 @@
      STEP 3: Replace firebaseConfig below with your own values
      (see the Firebase Setup Guide further down in this file)
 ═══════════════════════════════════════════════════════════════ -->
+
 <script type="module">
   import { initializeApp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -65,7 +67,10 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
 /* ── TABS ── */
 #tab-bar{background:rgba(250,248,244,.96);backdrop-filter:blur(20px);border-top:1px solid var(--fog);display:flex;align-items:flex-start;padding-top:8px;padding-bottom:8px;z-index:50;flex-shrink:0}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 0;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
-.tab-icon{font-size:22px;line-height:1;transition:transform .2s}
+.tab-icon{width:26px;height:26px;line-height:1;transition:transform .2s;display:flex;align-items:center;justify-content:center}
+.tab-icon svg{width:26px;height:26px;transition:opacity .2s}
+.tab.active .tab-icon svg .icon-stroke{stroke:var(--moss)}
+.tab-icon svg .icon-stroke{stroke:var(--ash);transition:stroke .2s}
 .tab-label{font-size:10px;color:var(--ash);transition:color .2s}
 .tab.active .tab-label{color:var(--moss);font-weight:500}
 .tab.active .tab-icon{transform:scale(1.1)}
@@ -105,9 +110,8 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
 /* Make home screen fill height with justified spacing — no gap */
 #screen-home.active{justify-content:space-between}
 .home-hero{padding:20px 28px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;position:relative;z-index:1}
-.home-icon{width:60px;height:60px;background:linear-gradient(135deg,var(--moss),#4a5c3a);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:4px;box-shadow:0 8px 24px rgba(107,124,90,.35)}
-.home-name{font-family:'Shippori Mincho',serif;font-size:24px;font-weight:600;color:var(--charcoal);letter-spacing:.03em}
-.home-jp{font-size:12px;color:var(--moss);letter-spacing:.3em;font-weight:300}
+.home-icon{width:110px;height:88px;background:none;border-radius:0;display:flex;align-items:center;justify-content:center;margin-bottom:4px;filter:drop-shadow(0 6px 20px rgba(107,124,90,.38))}
+.home-name{font-family:'Shippori Mincho',serif;font-size:20px;font-weight:600;color:var(--charcoal);letter-spacing:.02em}
 .player-badge{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--fog);border-radius:24px;padding:7px 14px 7px 9px;margin-top:8px;cursor:pointer;transition:all .2s;position:relative;z-index:1;-webkit-tap-highlight-color:transparent}
 .player-badge:active{transform:scale(.97)}
 .p-avatar{width:26px;height:26px;border-radius:50%;background:var(--moss);display:flex;align-items:center;justify-content:center;font-size:12px;color:white;font-weight:600}
@@ -307,6 +311,7 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
   }
 }
 </style>
+
 </head>
 <body>
 
@@ -314,201 +319,306 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
 
   <div id="screens">
 
-    <!-- HOME -->
-    <div id="screen-home" class="screen active">
-      <div class="home-bg hbg1"></div><div class="home-bg hbg2"></div>
-      <div class="home-hero">
-        <div class="home-icon">🌿</div>
-        <div class="home-name">Yenda Math</div>
-        <div class="home-jp">算数の練習</div>
-        <div class="player-badge" id="playerBadge" onclick="showNameModal()">
-          <div class="p-avatar p-av" id="homeAvatar">?</div>
-          <span class="p-name-text" id="homeNameText">Set your name</span>
-          <span class="p-edit">✎</span>
-        </div>
-      </div>
-      <div class="year-section">
-        <span class="section-lbl">Select Your Year</span>
-        <div class="year-grid" id="yearGrid">
-          <div class="year-btn active" data-year="0">Prep</div>
-          <div class="year-btn" data-year="1">Year 1</div>
-          <div class="year-btn" data-year="2">Year 2</div>
-          <div class="year-btn" data-year="3">Year 3</div>
-          <div class="year-btn" data-year="4">Year 4</div>
-          <div class="year-btn" data-year="5">Year 5</div>
-          <div class="year-btn" data-year="6">Year 6</div>
-          <div class="year-btn" data-year="7">Year 7</div>
-          <div class="year-btn" data-year="8">Year 8</div>
-          <div class="year-btn" data-year="9">Year 9</div>
-        </div>
-      </div>
-      <div class="home-stats">
-        <span class="section-lbl">Your Progress</span>
-        <div class="stats-row">
-          <div class="stat-card card"><div class="stat-val" id="st-sessions">0</div><div class="stat-lbl">Sessions</div></div>
-          <div class="stat-card card"><div class="stat-val" id="st-pb">—</div><div class="stat-lbl">Best Time</div></div>
-          <div class="stat-card card"><div class="stat-val" id="st-streak">0</div><div class="stat-lbl">Streak</div></div>
-        </div>
-      </div>
-      <div class="cta-wrap">
-        <button class="cta-btn" id="startBtn">Begin Today's Practice →</button>
-      </div>
+```
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="home-bg hbg1"></div><div class="home-bg hbg2"></div>
+  <div class="home-hero">
+    <div class="home-icon">
+      <!-- Option 3: Infinity brain — two lobes looping endlessly through each other -->
+      <svg width="110" height="88" viewBox="0 0 110 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Left lobe back path -->
+        <path d="M55 44 C50 28, 30 18, 20 28 C10 38, 14 56, 24 62 C36 68, 50 58, 55 44"
+          stroke="#8fa07a" stroke-width="7.5" stroke-linecap="round" fill="none"/>
+        <!-- Right lobe back path -->
+        <path d="M55 44 C60 28, 80 18, 90 28 C100 38, 96 56, 86 62 C74 68, 60 58, 55 44"
+          stroke="#6b7c5a" stroke-width="7.5" stroke-linecap="round" fill="none"/>
+        <!-- Crossing point — white knockout -->
+        <path d="M50 44 C52 42, 58 42, 60 44" stroke="#f5f2ed" stroke-width="12" stroke-linecap="round" fill="none"/>
+        <!-- Front strand over the crossing -->
+        <path d="M50 44 C52 46, 58 46, 60 44" stroke="#6b7c5a" stroke-width="7" stroke-linecap="round" fill="none"/>
+        <!-- Left lobe brain folds -->
+        <path d="M16 40 C18 34, 24 34, 24 42" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <path d="M14 52 C17 46, 23 47, 22 54" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <path d="M24 62 C27 56, 33 57, 32 64" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <path d="M36 26 C39 20, 45 21, 45 29" stroke="#c0d0b8" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <!-- Right lobe brain folds -->
+        <path d="M94 40 C92 34, 86 34, 86 42" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
+        <path d="M96 52 C93 46, 87 47, 88 54" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
+        <path d="M86 62 C83 56, 77 57, 78 64" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
+        <path d="M74 26 C71 20, 65 21, 65 29" stroke="#8fa07a" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".85"/>
+      </svg>
     </div>
+    <div class="home-name">Quick NAPLAN Maths</div>
+    <div class="player-badge" id="playerBadge" onclick="showNameModal()">
+      <div class="p-avatar p-av" id="homeAvatar">?</div>
+      <span class="p-name-text" id="homeNameText">Set your name</span>
+      <span class="p-edit">✎</span>
+    </div>
+  </div>
+  <div class="year-section">
+    <span class="section-lbl">Select Your Year</span>
+    <div class="year-grid" id="yearGrid">
+      <div class="year-btn active" data-year="0">Prep</div>
+      <div class="year-btn" data-year="1">Year 1</div>
+      <div class="year-btn" data-year="2">Year 2</div>
+      <div class="year-btn" data-year="3">Year 3</div>
+      <div class="year-btn" data-year="4">Year 4</div>
+      <div class="year-btn" data-year="5">Year 5</div>
+      <div class="year-btn" data-year="6">Year 6</div>
+      <div class="year-btn" data-year="7">Year 7</div>
+      <div class="year-btn" data-year="8">Year 8</div>
+      <div class="year-btn" data-year="9">Year 9</div>
+    </div>
+  </div>
+  <div class="home-stats">
+    <span class="section-lbl">Your Progress</span>
+    <div class="stats-row">
+      <div class="stat-card card"><div class="stat-val" id="st-sessions">0</div><div class="stat-lbl">Sessions</div></div>
+      <div class="stat-card card"><div class="stat-val" id="st-pb">—</div><div class="stat-lbl">Best Time</div></div>
+      <div class="stat-card card"><div class="stat-val" id="st-streak">0</div><div class="stat-lbl">Streak</div></div>
+    </div>
+  </div>
+  <div class="cta-wrap">
+    <button class="cta-btn" id="startBtn">Begin Today's Practice →</button>
+  </div>
+</div>
 
-    <!-- QUIZ -->
-    <div id="screen-quiz" class="screen">
-      <div class="quiz-header">
-        <span class="quiz-meta" id="quizMeta">Year 4 · Q 1 of 20</span>
-        <span class="quiz-timer" id="quizTimer">0:00</span>
-      </div>
-      <div class="progress-wrap"><div class="progress-dots" id="progressDots"></div></div>
-      <div class="question-wrap">
-        <div class="question-card card">
-          <span class="q-label">What is the answer?</span>
-          <div class="q-text" id="questionText">7 × 8 = ?</div>
-        </div>
-      </div>
-      <div class="options-wrap" id="optionsWrap"></div>
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <span class="quiz-meta" id="quizMeta">Year 4 · Q 1 of 20</span>
+    <span class="quiz-timer" id="quizTimer">0:00</span>
+  </div>
+  <div class="progress-wrap"><div class="progress-dots" id="progressDots"></div></div>
+  <div class="question-wrap">
+    <div class="question-card card">
+      <span class="q-label">What is the answer?</span>
+      <div class="q-text" id="questionText">7 × 8 = ?</div>
     </div>
+  </div>
+  <div class="options-wrap" id="optionsWrap"></div>
+</div>
 
-    <!-- RESULTS -->
-    <div id="screen-results" class="screen">
-      <div class="results-content">
-        <div class="result-badge" id="resultBadge">⭐</div>
-        <div class="result-title" id="resultTitle">Session Complete</div>
-        <div class="time-display card" style="width:100%">
-          <span class="time-label">Your Time</span>
-          <div class="time-value" id="resultTime">0:00</div>
-          <div class="time-delta" id="resultDelta"></div>
-        </div>
-        <div class="result-stats">
-          <div class="res-stat card"><div class="res-stat-val" id="rs-correct">—</div><div class="res-stat-lbl">Correct</div></div>
-          <div class="res-stat card"><div class="res-stat-val" id="rs-acc">—</div><div class="res-stat-lbl">Accuracy</div></div>
-          <div class="res-stat card"><div class="res-stat-val" id="rs-avg">—</div><div class="res-stat-lbl">Avg / Q</div></div>
-        </div>
-        <div class="upload-status" id="uploadStatus">
-          <div class="upload-icon" id="uploadIcon">⏳</div>
-          <div><div class="upload-text" id="uploadText">Uploading…</div><div class="upload-sub" id="uploadSub"></div></div>
-        </div>
-        <div class="ach-row card" id="achRow" style="display:none">
-          <span class="ach-title">Achievements Unlocked</span>
-          <div class="ach-chips" id="achChips"></div>
-        </div>
-        <div class="result-btns">
-          <button class="res-btn primary" id="playAgainBtn">Play Again</button>
-          <button class="res-btn secondary" id="viewRankBtn">🏆 Rankings</button>
-        </div>
-      </div>
+<!-- RESULTS -->
+<div id="screen-results" class="screen">
+  <div class="results-content">
+    <div class="result-badge" id="resultBadge">⭐</div>
+    <div class="result-title" id="resultTitle">Session Complete</div>
+    <div class="time-display card" style="width:100%">
+      <span class="time-label">Your Time</span>
+      <div class="time-value" id="resultTime">0:00</div>
+      <div class="time-delta" id="resultDelta"></div>
     </div>
+    <div class="result-stats">
+      <div class="res-stat card"><div class="res-stat-val" id="rs-correct">—</div><div class="res-stat-lbl">Correct</div></div>
+      <div class="res-stat card"><div class="res-stat-val" id="rs-acc">—</div><div class="res-stat-lbl">Accuracy</div></div>
+      <div class="res-stat card"><div class="res-stat-val" id="rs-avg">—</div><div class="res-stat-lbl">Avg / Q</div></div>
+    </div>
+    <div class="upload-status" id="uploadStatus">
+      <div class="upload-icon" id="uploadIcon">⏳</div>
+      <div><div class="upload-text" id="uploadText">Uploading…</div><div class="upload-sub" id="uploadSub"></div></div>
+    </div>
+    <div class="ach-row card" id="achRow" style="display:none">
+      <span class="ach-title">Achievements Unlocked</span>
+      <div class="ach-chips" id="achChips"></div>
+    </div>
+    <div class="result-btns">
+      <button class="res-btn primary" id="playAgainBtn">Play Again</button>
+      <button class="res-btn secondary" id="viewRankBtn">🏆 Rankings</button>
+    </div>
+  </div>
+</div>
 
-    <!-- RANKINGS -->
-    <div id="screen-rankings" class="screen">
-      <div class="rank-header">
-        <div>
-          <div class="screen-subtitle" style="margin-bottom:4px">Global</div>
-          <div class="screen-title">Rankings</div>
-        </div>
-        <select class="rank-filter" id="rankFilter">
-          <option value="0">Prep</option>
-          <option value="1">Year 1</option>
-          <option value="2">Year 2</option>
-          <option value="3">Year 3</option>
-          <option value="4" selected>Year 4</option>
-          <option value="5">Year 5</option>
-          <option value="6">Year 6</option>
-          <option value="7">Year 7</option>
-          <option value="8">Year 8</option>
-          <option value="9">Year 9</option>
-        </select>
-      </div>
-      <div class="offline-banner" id="offlineBanner">
-        <span>⚠️</span>
-        <span>Firebase not set up yet. <strong>See setup steps below</strong> to enable global rankings.</span>
-      </div>
-      <div class="podium-wrap"><div class="podium" id="podium"></div></div>
-      <div class="rank-list" id="rankList">
-        <div class="rank-loading"><div class="spin">🌿</div><p>Loading rankings…</p></div>
-      </div>
+<!-- RANKINGS -->
+<div id="screen-rankings" class="screen">
+  <div class="rank-header">
+    <div>
+      <div class="screen-subtitle" style="margin-bottom:4px">Global</div>
+      <div class="screen-title">Rankings</div>
     </div>
+    <select class="rank-filter" id="rankFilter">
+      <option value="0">Prep</option>
+      <option value="1">Year 1</option>
+      <option value="2">Year 2</option>
+      <option value="3">Year 3</option>
+      <option value="4" selected>Year 4</option>
+      <option value="5">Year 5</option>
+      <option value="6">Year 6</option>
+      <option value="7">Year 7</option>
+      <option value="8">Year 8</option>
+      <option value="9">Year 9</option>
+    </select>
+  </div>
+  <div class="offline-banner" id="offlineBanner">
+    <span>⚠️</span>
+    <span>Firebase not set up yet. <strong>See setup steps below</strong> to enable global rankings.</span>
+  </div>
+  <div class="podium-wrap"><div class="podium" id="podium"></div></div>
+  <div class="rank-list" id="rankList">
+    <div class="rank-loading"><div class="spin" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="14" stroke="#ddd8d0" stroke-width="2.5"/>
+        <path d="M18 4 A14 14 0 0 1 32 18" stroke="#6b7c5a" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div><p>Loading rankings…</p></div>
+  </div>
+</div>
 
-    <!-- HISTORY -->
-    <div id="screen-history" class="screen">
-      <div class="hist-header">
-        <div>
-          <div class="screen-subtitle" style="margin-bottom:4px">Performance</div>
-          <div class="screen-title">My Times</div>
-        </div>
-        <select class="hist-filter" id="histFilter">
-          <option value="0">Prep</option>
-          <option value="1">Year 1</option>
-          <option value="2">Year 2</option>
-          <option value="3">Year 3</option>
-          <option value="4" selected>Year 4</option>
-          <option value="5">Year 5</option>
-          <option value="6">Year 6</option>
-          <option value="7">Year 7</option>
-          <option value="8">Year 8</option>
-          <option value="9">Year 9</option>
-        </select>
-      </div>
-      <div class="chart-card card">
-        <span class="chart-lbl">Last 7 Sessions — shorter bar = faster time</span>
-        <div class="chart-bars" id="chartBars"></div>
-        <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Personal Best</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--moss)"></div>Most Recent</div>
-        </div>
-      </div>
-      <div class="session-list" id="sessionList"></div>
+<!-- HISTORY -->
+<div id="screen-history" class="screen">
+  <div class="hist-header">
+    <div>
+      <div class="screen-subtitle" style="margin-bottom:4px">Performance</div>
+      <div class="screen-title">My Times</div>
     </div>
+    <select class="hist-filter" id="histFilter">
+      <option value="0">Prep</option>
+      <option value="1">Year 1</option>
+      <option value="2">Year 2</option>
+      <option value="3">Year 3</option>
+      <option value="4" selected>Year 4</option>
+      <option value="5">Year 5</option>
+      <option value="6">Year 6</option>
+      <option value="7">Year 7</option>
+      <option value="8">Year 8</option>
+      <option value="9">Year 9</option>
+    </select>
+  </div>
+  <div class="chart-card card">
+    <span class="chart-lbl">Last 7 Sessions — shorter bar = faster time</span>
+    <div class="chart-bars" id="chartBars"></div>
+    <div class="chart-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Personal Best</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--moss)"></div>Most Recent</div>
+    </div>
+  </div>
+  <div class="session-list" id="sessionList"></div>
+</div>
 
-    <!-- CALENDAR -->
-    <div id="screen-calendar" class="screen">
-      <div class="cal-header">
-        <div class="cal-month" id="calMonth">April 2026</div>
-        <div class="cal-nav">
-          <div class="cal-nav-btn" id="calPrev">‹</div>
-          <div class="cal-nav-btn" id="calNext">›</div>
-        </div>
-      </div>
-      <div class="cal-grid-wrap">
-        <div class="cal-weekdays">
-          <div class="cal-wd">M</div><div class="cal-wd">T</div><div class="cal-wd">W</div>
-          <div class="cal-wd">T</div><div class="cal-wd">F</div><div class="cal-wd">S</div><div class="cal-wd">S</div>
-        </div>
-        <div class="cal-days" id="calDays"></div>
-      </div>
-      <div class="cal-cards">
-        <div class="streak-card card">
-          <div class="streak-icon">🔥</div>
-          <div><div class="streak-num" id="streakNum">0</div><div class="streak-txt">Day Streak</div></div>
-        </div>
-        <div class="last-card card">
-          <div><span class="last-lbl">Last Session</span><div class="last-val" id="lastVal">No sessions yet</div></div>
-          <div class="last-ago" id="lastAgo"></div>
-        </div>
-      </div>
+<!-- CALENDAR -->
+<div id="screen-calendar" class="screen">
+  <div class="cal-header">
+    <div class="cal-month" id="calMonth">April 2026</div>
+    <div class="cal-nav">
+      <div class="cal-nav-btn" id="calPrev">‹</div>
+      <div class="cal-nav-btn" id="calNext">›</div>
     </div>
+  </div>
+  <div class="cal-grid-wrap">
+    <div class="cal-weekdays">
+      <div class="cal-wd">M</div><div class="cal-wd">T</div><div class="cal-wd">W</div>
+      <div class="cal-wd">T</div><div class="cal-wd">F</div><div class="cal-wd">S</div><div class="cal-wd">S</div>
+    </div>
+    <div class="cal-days" id="calDays"></div>
+  </div>
+  <div class="cal-cards">
+    <div class="streak-card card">
+      <div class="streak-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 3C14 3 18 8 17 12C20 9 20 6 20 6C22 9 23 13 21 17C19.5 20 17 22 14 23C11 22 8.5 20 7 17C5 13 6 9 8 6C8 6 8 9 11 12C10 8 14 3 14 3Z" stroke="#c49a5a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M14 23C12 21 11 19 11.5 17C12 15 14 14 14 14C14 14 16 15 16.5 17C17 19 16 21 14 23Z" stroke="#c49a5a" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div><div class="streak-num" id="streakNum">0</div><div class="streak-txt">Day Streak</div></div>
+    </div>
+    <div class="last-card card">
+      <div><span class="last-lbl">Last Session</span><div class="last-val" id="lastVal">No sessions yet</div></div>
+      <div class="last-ago" id="lastAgo"></div>
+    </div>
+  </div>
+</div>
+```
 
   </div><!-- /screens -->
 
   <div id="tab-bar">
-    <div class="tab active" data-screen="home"><div class="tab-icon">🏠</div><div class="tab-label">Home</div></div>
-    <div class="tab" data-screen="quiz"><div class="tab-icon">✏️</div><div class="tab-label">Quiz</div></div>
-    <div class="tab" data-screen="rankings"><div class="tab-icon">🏆</div><div class="tab-label">Rankings</div></div>
-    <div class="tab" data-screen="history"><div class="tab-icon">📊</div><div class="tab-label">History</div></div>
-    <div class="tab" data-screen="calendar"><div class="tab-icon">📅</div><div class="tab-label">Calendar</div></div>
+    <!-- Home: house outline -->
+    <div class="tab active" data-screen="home">
+      <div class="tab-icon">
+        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="icon-stroke" d="M3 11.5L13 3L23 11.5V22a1 1 0 01-1 1H16v-5h-6v5H4a1 1 0 01-1-1V11.5z" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="tab-label">Home</div>
+    </div>
+    <!-- Quiz: pencil writing -->
+    <div class="tab" data-screen="quiz">
+      <div class="tab-icon">
+        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="icon-stroke" d="M4 19.5L9 18L19.5 7.5a2.121 2.121 0 00-3-3L6 15l-2 4.5z" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path class="icon-stroke" d="M16.5 7.5l3 3" stroke-width="1.8" stroke-linecap="round"/>
+          <path class="icon-stroke" d="M4 22h18" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="tab-label">Quiz</div>
+    </div>
+    <!-- Rankings: podium bars -->
+    <div class="tab" data-screen="rankings">
+      <div class="tab-icon">
+        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect class="icon-stroke" x="2" y="13" width="6" height="9" rx="1" stroke-width="1.8"/>
+          <rect class="icon-stroke" x="10" y="8" width="6" height="14" rx="1" stroke-width="1.8"/>
+          <rect class="icon-stroke" x="18" y="16" width="6" height="6" rx="1" stroke-width="1.8"/>
+          <path class="icon-stroke" d="M13 5l1 2h2l-1.5 1.5.5 2L13 9.5 11 10.5l.5-2L10 7h2z" stroke-width="1.2" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="tab-label">Rankings</div>
+    </div>
+    <!-- History: line chart -->
+    <div class="tab" data-screen="history">
+      <div class="tab-icon">
+        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="icon-stroke" d="M3 20h20" stroke-width="1.8" stroke-linecap="round"/>
+          <path class="icon-stroke" d="M3 20V6" stroke-width="1.8" stroke-linecap="round"/>
+          <path class="icon-stroke" d="M6 15L10 10L14 13L20 6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle class="icon-stroke" cx="20" cy="6" r="1.5" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="tab-label">History</div>
+    </div>
+    <!-- Calendar: month grid -->
+    <div class="tab" data-screen="calendar">
+      <div class="tab-icon">
+        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect class="icon-stroke" x="3" y="5" width="20" height="18" rx="2" stroke-width="1.8"/>
+          <path class="icon-stroke" d="M3 10h20" stroke-width="1.8" stroke-linecap="round"/>
+          <path class="icon-stroke" d="M8 3v4M18 3v4" stroke-width="1.8" stroke-linecap="round"/>
+          <circle class="icon-stroke" cx="9" cy="15" r="1" stroke-width="1.5"/>
+          <circle class="icon-stroke" cx="13" cy="15" r="1" stroke-width="1.5"/>
+          <circle class="icon-stroke" cx="17" cy="15" r="1" stroke-width="1.5"/>
+          <circle class="icon-stroke" cx="9" cy="20" r="1" stroke-width="1.5"/>
+          <circle class="icon-stroke" cx="13" cy="20" r="1" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="tab-label">Calendar</div>
+    </div>
   </div>
 
   <!-- NAME MODAL -->
+
   <div id="name-modal">
     <div class="modal-card">
-      <div class="modal-icon">👤</div>
+      <div class="modal-icon">
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="15" r="7" stroke="#6b7c5a" stroke-width="2"/>
+          <path d="M6 38C6 30 13 24 22 24C31 24 38 30 38 38" stroke="#6b7c5a" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
       <div class="modal-title">What's your name?</div>
       <div class="modal-sub">Your name appears on the<br>global rankings board.</div>
       <div class="name-input-wrap">
         <input class="name-input" id="nameInput" type="text" placeholder="Enter your name…" maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false">
-        <div class="dice-btn" id="diceBtn" title="Random name">🎲</div>
+        <div class="dice-btn" id="diceBtn" title="Random name">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="18" height="18" rx="4" stroke="#b8b2a8" stroke-width="1.6"/>
+            <circle cx="7" cy="7" r="1.4" fill="#b8b2a8"/>
+            <circle cx="15" cy="7" r="1.4" fill="#b8b2a8"/>
+            <circle cx="7" cy="15" r="1.4" fill="#b8b2a8"/>
+            <circle cx="15" cy="15" r="1.4" fill="#b8b2a8"/>
+            <circle cx="11" cy="11" r="1.4" fill="#b8b2a8"/>
+          </svg>
+        </div>
       </div>
       <div class="name-hint">or <span id="randomLink">pick a random name</span> for me</div>
       <button class="modal-save" id="saveNameBtn">Save & Play →</button>
@@ -518,7 +628,7 @@ html,body{height:100%;height:-webkit-fill-available;background:var(--ink);font-f
 
   <div id="toast"></div>
 </div>
-<div id="desktop-hint">Yenda Math · 算数の練習</div>
+<div id="desktop-hint">Quick NAPLAN Maths</div>
 
 <script>
 /* ══════════════════════════════════════════════
@@ -533,7 +643,7 @@ let calDate      = new Date();
 let histYear     = selYear;
 let rankYear     = selYear;
 
-let qList=[], qIdx=0, qCorrect=0, qStart=0, qElapsed=0, qTimerInt=null, qAnswered=false;
+let qList=[], qIdx=0, qCorrect=0, qStart=0, qElapsed=0, qPenalty=0, qTimerInt=null, qAnswered=false;
 
 function save(){
   localStorage.setItem('ym_name', playerName);
@@ -705,7 +815,7 @@ async function loadRankings(){
       const row=document.createElement('div');
       row.className='rank-row card'+(me?' me':'');
       const eLbl=e.year===0?'Prep':`Year ${e.year}`;
-      row.innerHTML=`<div class="rank-left"><div class="rk-num">${i+1}</div><div class="rk-av" style="background:${avColor(e.playerName)}">${(e.playerName||'?').charAt(0).toUpperCase()}</div><div class="rk-info"><div class="rk-player">${esc(e.playerName||'Anonymous')}${me?' 👈':''}</div><div class="rk-meta">${eLbl} · ${e.accuracy}% · ${new Date(e.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</div></div></div><div class="rk-right"><div class="rk-time">${fmt(e.duration)}</div>${i===0?'<div class="rk-crown">👑</div>':''}</div>`;
+      row.innerHTML=`<div class="rank-left"><div class="rk-num">${i+1}</div><div class="rk-av" style="background:${avColor(e.playerName)}">${(e.playerName||'?').charAt(0).toUpperCase()}</div><div class="rk-info"><div class="rk-player">${esc(e.playerName||'Anonymous')}${me?' 👈':''}</div><div class="rk-meta">${eLbl} · ${e.accuracy}% · ${new Date(e.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</div></div></div><div class="rk-right"><div class="rk-time">${fmt(e.duration)}</div>${i===0?`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 5l3 3 4-4 4 4 3-3V12H1V5z" stroke="#c49a5a" stroke-width="1.5" stroke-linejoin="round" fill="none"/><path d="M1 12h14" stroke="#c49a5a" stroke-width="1.5" stroke-linecap="round"/></svg>`:''}</div>`;
       list.appendChild(row);
     });
   }catch(err){
@@ -718,7 +828,12 @@ function buildPodium(top){
   if(!top.length) return;
   const order=top.length>=2?[top[1],top[0],top[2]].filter(Boolean):[top[0]];
   const cls=top.length>=2?['pc2','pc1','pc3']:['pc1'];
-  const medals=['🥇','🥈','🥉'];
+  // SVG medals — star for gold, circle for silver, triangle for bronze
+  const medals=[
+    `<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2l2.2 5h5l-4 3.2 1.5 5.3L11 12.5l-4.7 3 1.5-5.3L3.8 7h5z" stroke="white" stroke-width="1.5" stroke-linejoin="round" fill="none"/></svg>`,
+    `<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="7" stroke="white" stroke-width="1.6"/><circle cx="11" cy="11" r="3" stroke="white" stroke-width="1.3" opacity=".6"/></svg>`,
+    `<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4l8 14H3z" stroke="white" stroke-width="1.5" stroke-linejoin="round" fill="none"/></svg>`
+  ];
   const idxMap=top.length>=2?[1,0,2]:[0];
   order.forEach((e,i)=>{
     const col=document.createElement('div'); col.className='podium-col '+cls[i];
@@ -772,10 +887,10 @@ document.getElementById('startBtn').addEventListener('click',()=>{
    QUIZ
 ══════════════════════════════════════════════ */
 function startQuiz(){
-  qList=genQs(selYear); qIdx=0; qCorrect=0; qElapsed=0; qAnswered=false;
+  qList=genQs(selYear); qIdx=0; qCorrect=0; qElapsed=0; qPenalty=0; qAnswered=false;
   qStart=Date.now(); clearInterval(qTimerInt);
   qTimerInt=setInterval(()=>{
-    qElapsed=(Date.now()-qStart)/1000;
+    qElapsed=(Date.now()-qStart)/1000 + qPenalty;
     const el=document.getElementById('quizTimer'); el.textContent=fmt(qElapsed);
     const ys=sessions.filter(s=>s.year===selYear);
     el.classList.toggle('pb-pace',ys.length&&qElapsed<Math.min(...ys.map(s=>s.duration)));
@@ -797,7 +912,17 @@ function renderQ(){
     b.addEventListener('click',()=>{
       if(qAnswered) return; qAnswered=true;
       const correct = o===q.correct;
-      if(correct){ qCorrect++; playDing(); }
+      if(correct){
+        qCorrect++; playDing();
+      } else {
+        // Add 30-second penalty to the running time
+        qPenalty += 30;
+        // Flash the timer red to signal the penalty
+        const timerEl = document.getElementById('quizTimer');
+        timerEl.style.color = 'var(--sakura)';
+        timerEl.style.transition = 'color 0s';
+        setTimeout(() => { timerEl.style.transition = 'color 0.8s'; timerEl.style.color = ''; }, 400);
+      }
       document.querySelectorAll('.opt-btn').forEach(x=>{ x.classList.add('disabled'); if(x.textContent===q.correct) x.classList.add('correct'); else if(x===b&&!correct) x.classList.add('wrong'); });
       setTimeout(()=>{ qIdx++; qIdx>=20?finishQuiz():(renderDots(),renderQ()); },700);
     });
@@ -815,12 +940,16 @@ async function finishQuiz(){
   sessions.unshift(session);
   const newAchs=checkAch(session,sessions);
   save();
-  // Results UI
+  // SVG icons for result badge
+  const svgStar=`<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 4l3.5 8 8.5 1-6 6 1.5 8.5L18 23l-7.5 4.5L12 18l-6-6 8.5-1z" stroke="white" stroke-width="1.8" stroke-linejoin="round" fill="none"/></svg>`;
+  const svgLeaf=`<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 30C18 30 8 24 8 14C8 9 12 6 18 6C24 6 28 9 28 14C28 24 18 30 18 30Z" stroke="white" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M18 30V18M18 18C18 18 12 15 11 10M18 18C18 18 24 15 25 10" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>`;
+  const svgBook=`<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 8C8 8 13 6 18 8C23 6 28 8 28 8V28C28 28 23 26 18 28C13 26 8 28 8 28V8Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" fill="none"/><path d="M18 8V28" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M12 12h4M12 16h4M12 20h4" stroke="white" stroke-width="1.3" stroke-linecap="round" opacity=".7"/></svg>`;
+
   const badge=document.getElementById('resultBadge');
   const title=document.getElementById('resultTitle');
-  if(isPB&&prevPB){badge.className='result-badge badge-pb';badge.textContent='⭐';title.textContent='New Personal Best!';}
-  else if(qCorrect>=18){badge.className='result-badge badge-good';badge.textContent='🌿';title.textContent='Excellent Work!';}
-  else{badge.className='result-badge badge-ok';badge.textContent='📖';title.textContent='Session Complete';}
+  if(isPB&&prevPB){badge.className='result-badge badge-pb';badge.innerHTML=svgStar;title.textContent='New Personal Best!';}
+  else if(qCorrect>=18){badge.className='result-badge badge-good';badge.innerHTML=svgLeaf;title.textContent='Excellent Work!';}
+  else{badge.className='result-badge badge-ok';badge.innerHTML=svgBook;title.textContent='Session Complete';}
   document.getElementById('resultTime').textContent=fmt(dur);
   const dl=document.getElementById('resultDelta');
   if(isPB&&prevPB){dl.textContent=`↓ ${fmt(prevPB-dur)} faster than your best`;dl.style.color='var(--amber)';}
@@ -847,15 +976,15 @@ document.getElementById('viewRankBtn').addEventListener('click',()=>navigate('ra
 function checkAch(s,all){
   const new_=[]; const ys=all.filter(x=>x.year===s.year);
   const ck=(id,label,type,cond)=>{ if(!achievements.includes(id)&&cond){achievements.push(id);new_.push({label,type});}};
-  ck('pb'+s.year,'🏆 Speed Star','gold',s.isPB&&ys.length>1);
-  ck('perf'+s.year+s.correct,'✨ Perfect Score','gold',s.correct===20);
+  ck('pb'+s.year,'★ Speed Star','gold',s.isPB&&ys.length>1);
+  ck('perf'+s.year+s.correct,'◆ Perfect Score','gold',s.correct===20);
   const st=calcStreak();
-  ck('s3','🔥 3-Day Streak','green',st>=3); ck('s7','🔥 7-Day Streak','gold',st>=7);
+  ck('s3','▲ 3-Day Streak','green',st>=3); ck('s7','▲ 7-Day Streak','gold',st>=7);
   const lvlName=s.year===0?'Prep':`Year ${s.year}`;
-  ck('y'+s.year,`📖 ${lvlName} Started`,'green',ys.length===1);
-  ck('c100','💯 Century','gold',all.length>=100);
-  ck('eb','🌅 Early Bird','green',new Date(s.date).getHours()<8);
-  ck('acc90','🎯 Sharp Solver','green',s.correct>=18);
+  ck('y'+s.year,`◉ ${lvlName} Started`,'green',ys.length===1);
+  ck('c100','◆ Century','gold',all.length>=100);
+  ck('eb','◐ Early Bird','green',new Date(s.date).getHours()<8);
+  ck('acc90','◎ Sharp Solver','green',s.correct>=18);
   return new_;
 }
 
@@ -1143,5 +1272,6 @@ if(!playerName) setTimeout(showNameModal,700);
 ║                                                                  ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
+
 </body>
 </html>
