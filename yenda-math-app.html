@@ -21,25 +21,24 @@
      │  PASTE YOUR FIREBASE CONFIG HERE (Step 3 below)    │
      └─────────────────────────────────────────────────────┘ */
   const firebaseConfig = {
-    apiKey:            "YOUR_API_KEY",
-    authDomain:        "YOUR_PROJECT.firebaseapp.com",
-    databaseURL:       "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-    projectId:         "YOUR_PROJECT_ID",
-    storageBucket:     "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId:             "YOUR_APP_ID"
+    apiKey:            "AIzaSyALyuilwdXv6DKIE6T3OdcEaC-bjxlZvlY",
+    authDomain:        "yenda-s-naplan-math-game.firebaseapp.com",
+    databaseURL:       "https://yenda-s-naplan-math-game-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:         "yenda-s-naplan-math-game",
+    storageBucket:     "yenda-s-naplan-math-game.firebasestorage.app",
+    messagingSenderId: "1048236999293",
+    appId:             "1:1048236999293:web:2498f827b79b74f4dee714",
+    measurementId:     "G-BMPKRX844Q"
   };
 
   try {
-    if (firebaseConfig.apiKey === "YOUR_API_KEY") throw new Error("not-configured");
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
     window._fb = { db, ref, push, get, query, orderByChild, limitToLast };
     console.log("✅ Firebase connected");
   } catch(e) {
     window._fb = null;
-    if (e.message !== "not-configured") console.warn("Firebase error:", e.message);
-    console.info("ℹ️  Running in offline mode — see Firebase Setup Guide in HTML source");
+    console.warn("Firebase error:", e.message);
   }
   document.dispatchEvent(new Event('fb-ready'));
 </script>
@@ -801,7 +800,9 @@ async function finishQuiz(){
   if(newAchs.length){ar.style.display='block';ac.innerHTML='';newAchs.forEach((a,i)=>{const c=document.createElement('div');c.className='ach-chip '+(a.type==='gold'?'gold':'green');c.style.animationDelay=(i*.1)+'s';c.textContent=a.label;ac.appendChild(c);});}
   else ar.style.display='none';
   navigate('results');
+  // Upload score, then auto-navigate to rankings after fanfare finishes (~1.1s)
   uploadScore(session);
+  setTimeout(()=>navigate('rankings'), 2200);
 }
 document.getElementById('playAgainBtn').addEventListener('click',()=>{startQuiz();navigate('quiz');});
 document.getElementById('viewRankBtn').addEventListener('click',()=>navigate('rankings'));
